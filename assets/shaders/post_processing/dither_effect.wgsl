@@ -26,7 +26,9 @@ fn fragment(
 ) -> @location(0) vec4<f32> {
 	let uv = coords_to_viewport_uv(position.xy, view.viewport);
 
-	let noise = vec3<f32>(gold_noise(position.xy, 1.1), gold_noise(position.xy, 2.1), gold_noise(position.xy, 3.1)) - 0.5;
+	let C = textureSample(texture, our_sampler, vec2<f32>(uv.x, uv.y));
+
+	let noise = vec3<f32>(gold_noise(position.xy, 1.1 + C.r), gold_noise(position.xy, 2.1 + C.g), gold_noise(position.xy, 3.1 + C.b)) - 0.5;
 //	let threshold = vec3<f32>(0.1);
 
 	let quant_step = 0.50;

@@ -4,6 +4,7 @@ use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat, T
 use bevy::render::texture::BevyDefault;
 use bevy::render::view::RenderLayers;
 
+use crate::components::AngularVelocity;
 use crate::post_processing::effects::{test, flip, jpeg, dither, feedback};
 use crate::post_processing::setup::{EffectOutput, link_texture};
 use crate::post_processing::{spawn_effect, self, link_effect};
@@ -22,14 +23,8 @@ impl Plugin for SetupPlugin {
 		.add_plugin(post_processing::EffectPlugin::<feedback::Effect>::default())
 		.add_startup_system(vfx_setup)
 		.add_startup_system(scene_setup)
-		.add_system(rotation_system)
 		.add_system(update_effects.in_set(VFXChangeSystemSet));
 	}
-}
-
-#[derive(Component)]
-struct Rotating {
-	axis: Vec3
 }
 
 fn scene_setup(
@@ -61,7 +56,7 @@ fn scene_setup(
 		material: material,
 		transform: Transform::from_xyz(0.0, 2.0, 0.0),
 		..default()
-	}).insert(Rotating {axis: Vec3::Y});
+	}).insert(AngularVelocity(Vec3::Y));
 
 	commands.spawn(PointLightBundle {
 		point_light: PointLight {
@@ -147,15 +142,6 @@ fn vfx_setup(world: &mut World) {
 
 	let flip = spawn_effect::<flip::Effect>(world, 31, EffectOutput::Window {output_window: window});
 	link_effect::<flip::Effect>(world, feedback, flip, 0);
-}
-
-fn rotation_system(
-	time: Res<Time>,
-	mut objects: Query<(&mut Transform, &Rotating)>
-) {
-	for (mut transform, rotating) in objects.iter_mut() {
-		transform.rotate_axis(rotating.axis.normalize(), time.delta_seconds() * rotating.axis.length());
-	}
 }
 
 fn update_effects(
