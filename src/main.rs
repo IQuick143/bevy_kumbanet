@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, winit::WinitPlugin};
 
 mod post_processing;
 mod components;
@@ -13,7 +13,14 @@ mod debug;
 
 fn main() {
 	let default_plugins = DefaultPlugins;
-	
+
+	let default_plugins = default_plugins.set(WindowPlugin {
+		primary_window: Some(Window {
+			title: "KUMBANET client v0.3".to_string(),
+			..Default::default()
+		}), ..Default::default()
+	});
+
 	#[cfg(debug_assertions)]
 	let default_plugins = default_plugins.set(AssetPlugin {
 		watch_for_changes: true,

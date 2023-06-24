@@ -1,5 +1,5 @@
 # KUMBANET
-A "game" for GBTK Jam #9
+An experince (NO GAME!!!) for GBTK Jam #9
 
 # WARNING:
 Usage of this software could trigger **photosensitive epilepsy** or other adverse reactions in certain individuals.
