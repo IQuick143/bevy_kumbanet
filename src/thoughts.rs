@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::prelude::{Thought, Player};
+use crate::prelude::{Thought, Player, Interactable};
 
 pub struct ThoughtsPlugin;
 
@@ -60,6 +60,7 @@ fn spawn_thought(
 		..default()
 		},
 		Thought,
+		Interactable {radius: 1.0},
 	))
 	.id()
 }
