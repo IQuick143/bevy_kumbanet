@@ -1,5 +1,7 @@
-use bevy::prelude::*;
-use crate::{components::*, physics::PhysicsSystemSet};
+use std::f32::consts::PI;
+
+use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, render::camera::{RenderTarget, Viewport}};
+use crate::{components::*, physics::PhysicsSystemSet, resources::MainRenderTexture};
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct PlayerHarness;
@@ -15,18 +17,21 @@ impl Plugin for PlayerBehaviourPlugin {
 	}
 }
 
-pub fn spawn_player(
+pub fn spawn_player_and_cameras(
 	mut commands: Commands,
 	mut meshes: ResMut<Assets<Mesh>>,
-//	mut materials: ResMut<Assets<StandardMaterial>>
+	render_target: Res<MainRenderTexture>,
 ) {
 	let capsule_handle = meshes.add(Mesh::from(shape::Capsule {
 		radius: 0.5, depth: 1.0, ..Default::default()
 	}));
 
+	let half_size = UVec2::new(render_target.width / 2, render_target.height / 2);
+
 	// Outer player transform object
 	commands
 	.spawn((Player,
+		render_target.texture.clone(),
 		Velocity(Vec3::ZERO), VelocityDrag(0.1),
 		AngularVelocity(Vec3::ZERO), AngularVelocityDrag(0.1),
 		SpatialBundle::default()
@@ -39,10 +44,56 @@ pub fn spawn_player(
 			transform: Transform::default().looking_to(-Vec3::Y, Vec3::Z),
 			..default()
 		});
+		// 3rd person camera
+		player_holder
+		.spawn(Camera3dBundle {
+			camera: Camera {
+				viewport: Some(Viewport {physical_position: UVec2::ZERO, physical_size: half_size, ..Default::default()}),
+				target: RenderTarget::Image(render_target.texture.clone()),
+				order: -1, is_active: true, ..Default::default()
+			},
+			projection: Projection::Perspective(PerspectiveProjection { fov: PI/3.0, aspect_ratio: 1.2, ..default() }),
+			camera_3d: Camera3d {clear_color: ClearColorConfig::None, ..Default::default()},
+			transform: Transform::from_translation(Vec3::new(0.0, 2.0, 8.0)).looking_at(Vec3::ZERO, Vec3::Y),
+			..Default::default()
+		});
 		// Unrotated transform
 		player_holder.spawn((PlayerHarness, SpatialBundle::default()))
-		.with_children(|_parent| {
+		.with_children(|parent| {
 			// Orthocams
+			parent.spawn(Camera3dBundle {
+				camera: Camera {
+					viewport: Some(Viewport {physical_position: UVec2::new(half_size.x, 0), physical_size: half_size, ..Default::default()}),
+					target: RenderTarget::Image(render_target.texture.clone()),
+					order: -2, is_active: true, ..Default::default()
+				},
+				projection: Projection::Orthographic(OrthographicProjection {scale: 0.1, ..Default::default()}),
+				camera_3d: Camera3d {clear_color: ClearColorConfig::None, ..Default::default()},
+				transform: Transform::from_translation(10.0 * Vec3::Z).looking_at(Vec3::ZERO, Vec3::Y),
+				..Default::default()
+			});
+			parent.spawn(Camera3dBundle {
+				camera: Camera {
+					viewport: Some(Viewport {physical_position: half_size, physical_size: half_size, ..Default::default()}),
+					target: RenderTarget::Image(render_target.texture.clone()),
+					order: -3, is_active: true, ..Default::default()
+				},
+				projection: Projection::Orthographic(OrthographicProjection {scale: 0.1, ..Default::default()}),
+				camera_3d: Camera3d {clear_color: ClearColorConfig::None, ..Default::default()},
+				transform: Transform::from_translation(10.0 * Vec3::Y).looking_at(Vec3::ZERO, Vec3::X),
+				..Default::default()
+			});
+			parent.spawn(Camera3dBundle {
+				camera: Camera {
+					viewport: Some(Viewport {physical_position: UVec2::new(0, half_size.y), physical_size: half_size, ..Default::default()}),
+					target: RenderTarget::Image(render_target.texture.clone()),
+					order: -4, is_active: true, ..Default::default()
+				},
+				projection: Projection::Orthographic(OrthographicProjection {scale: 0.1, ..Default::default()}),
+				camera_3d: Camera3d {clear_color: ClearColorConfig::None, ..Default::default()},
+				transform: Transform::from_translation(10.0 * Vec3::X).looking_at(Vec3::ZERO, Vec3::Z),
+				..Default::default()
+			});
 		});
 	});
 }
@@ -75,6 +126,6 @@ pub fn player_controller(
 
 pub fn player_transform(mut harness: Query<&mut Transform, With<PlayerHarness>>) {
 	for mut transform in harness.iter_mut() {
-		transform.rotation = Quat::IDENTITY;
+		transform.look_to(Vec3::NEG_Z, Vec3::Y);
 	}
 }
