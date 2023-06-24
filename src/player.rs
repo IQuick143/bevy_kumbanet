@@ -87,7 +87,7 @@ pub fn spawn_player_and_cameras(
 				..Default::default()
 			})
 			.insert(Name::new("Top Down View Camera"));
-			parent.spawn(Camera3dBundle {
+			parent.spawn((Camera3dBundle {
 				camera: Camera {
 					viewport: Some(Viewport {physical_position: UVec2::new(0, half_size.y), physical_size: half_size, ..Default::default()}),
 					target: RenderTarget::Image(render_target.texture.clone()),
@@ -97,7 +97,8 @@ pub fn spawn_player_and_cameras(
 				camera_3d: Camera3d {clear_color: ClearColorConfig::None, ..Default::default()},
 				transform: Transform::from_translation(10.0 * Vec3::X).looking_at(Vec3::ZERO, Vec3::Z),
 				..Default::default()
-			})
+			},
+			ClearCamera(false)))
 			.insert(Name::new("Side View Camera"));
 		});
 	});

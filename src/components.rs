@@ -26,3 +26,6 @@ pub struct Hand;
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct Thought;
+
+#[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
+pub struct ClearCamera(pub bool);
