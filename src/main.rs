@@ -2,6 +2,7 @@ use bevy::{prelude::*, winit::WinitPlugin};
 
 mod post_processing;
 mod components;
+mod controls;
 mod test_scene;
 mod resources;
 mod physics;
@@ -32,6 +33,7 @@ fn main() {
 	app
 		.add_plugins(default_plugins)
 		.init_resource::<resources::MainRenderTexture>()
+		.add_plugin(controls::ControlsPlugin {})
 		.add_plugin(physics::PhysicsPlugin {})
 		.add_plugin(player::PlayerBehaviourPlugin {})
 		.add_plugin(test_scene::SetupPlugin {})
