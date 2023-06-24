@@ -26,7 +26,7 @@ fn spawn_hand(
 ) {
 	commands.spawn((SpriteBundle {
 		texture: asset_server.load("ui/hand.png"),
-		transform: Transform::from_translation(Vec3::splat(1000.0)),
+		transform: Transform::from_translation(Vec3::new(1000.0, 1000.0, 0.0)),
 		..Default::default()
 	},
 	Hand

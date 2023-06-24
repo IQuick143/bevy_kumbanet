@@ -41,7 +41,7 @@ fn main() {
 	app
 		.add_plugins(default_plugins)
 		.init_resource::<resources::MainRenderTexture>()
-		.add_plugin(controls::ControlsPlugin {})
+		//.add_plugin(controls::ControlsPlugin {})
 		.add_plugin(physics::PhysicsPlugin {})
 		.add_plugin(player::PlayerBehaviourPlugin {})
 		.add_plugin(thoughts::ThoughtsPlugin {})

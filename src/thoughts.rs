@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use rand::Rng;
 
 use crate::prelude::{Thought, Player};
 
@@ -22,7 +23,7 @@ fn spawn_thoughts(
 	mut materials: ResMut<Assets<StandardMaterial>>,
 	asset_server: Res<AssetServer>,
 ) {
-	commands.spawn((MaterialMeshBundle {
+	/*commands.spawn((MaterialMeshBundle {
 		mesh: mesh.add(Mesh::from(shape::Quad::default())),
 		material: materials.add(StandardMaterial {
 			base_color_texture: Some(asset_server.load("ui/hand.png")),
@@ -32,7 +33,35 @@ fn spawn_thoughts(
 		},
 		Thought,
 	))
-	.insert(Name::new("Thought"));
+	.insert(Name::new("Thought"));*/
+
+	let mut rng = rand::thread_rng();
+	for _ in 1..100 {
+		let (x, y, z) = rng.gen();
+		let thought = spawn_thought(&mut commands, &mut mesh, &mut materials, &asset_server, (Vec3::new(x, y, z) - 0.5) * 100.0);
+		commands.entity(thought).insert(Name::new("Cringe"));
+	}
+}
+
+fn spawn_thought(
+	commands: &mut Commands,
+	mesh: &mut ResMut<Assets<Mesh>>,
+	materials: &mut ResMut<Assets<StandardMaterial>>,
+	asset_server: &Res<AssetServer>,
+	location: Vec3,
+) -> Entity {
+	commands.spawn((MaterialMeshBundle {
+		mesh: mesh.add(Mesh::from(shape::Torus::default())),
+		material: materials.add(StandardMaterial {
+			base_color_texture: Some(asset_server.load("ui/hand.png")),
+			..default()
+		}),
+		transform: Transform::from_translation(location),
+		..default()
+		},
+		Thought,
+	))
+	.id()
 }
 
 fn rotate_thoughts(
@@ -40,23 +69,7 @@ fn rotate_thoughts(
 	player_query: Query<&Transform, (With<Player>, Without<Thought>)>,
 ) {
 	let player_transform = player_query.single();
-	//let player_translation = player_transform.translation;
-
 	for mut thought_transform in thoughts_query.iter_mut() {
-		/*let thought_forward = thought_transform.rotation * Vec3::Y;
-		let to_player = (player_translation - thought_transform.translation).normalize();
-		let forward_dot_player = thought_forward.dot(to_player);
-		if (forward_dot_player - 1.0).abs() < f32::EPSILON {
-            continue;
-        }
-		let thought_right = thought_transform.rotation * Vec3::X;
-		let right_dot_player = thought_right.dot(to_player);
-		let rotation_sign = -f32::copysign(1.0, right_dot_player);
-		let max_angle = forward_dot_player.clamp(-1.0, 1.0).acos();
-		let rotation_angle = rotation_sign * (5.0_f32).min(max_angle);
-
-		thought_transform.rotate_z(rotation_angle);*/
-
 		thought_transform.look_at(-player_transform.translation, Vec3::Y);
 	}
 }

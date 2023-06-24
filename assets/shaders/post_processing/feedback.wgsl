@@ -30,7 +30,7 @@ fn fragment(
 ) -> @location(0) vec4<f32> {
 //	let uv = coords_to_viewport_uv(position.xy, view.viewport);
 
-	let alfa = 0.15;
+	let alfa = 0.420;
 	let beta = 0.1;
 	let omega = 0.05;
 	let d_omega = 0.01;
