@@ -26,7 +26,11 @@ pub fn spawn_player(
 
 	// Outer player transform object
 	commands
-	.spawn((Player, Velocity(Vec3::ZERO), AngularVelocity(Vec3::ZERO), SpatialBundle::default()))
+	.spawn((Player,
+		Velocity(Vec3::ZERO), VelocityDrag(0.1),
+		AngularVelocity(Vec3::ZERO), AngularVelocityDrag(0.1),
+		SpatialBundle::default()
+	))
 	.with_children(|player_holder| {
 		// Visible player object
 		player_holder
