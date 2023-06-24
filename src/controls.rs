@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 
 pub struct ControlsPlugin;
 
@@ -21,5 +21,7 @@ fn spawn_hand(
 	commands.spawn(SpriteBundle {
 		transform: Transform::from_scale(Vec3::new(150.0, 150.0, 1.0)),
 		..Default::default()
-	});
+	})
+	.insert(RenderLayers::layer(1))
+	.insert(Name::new("Hand"));
 }

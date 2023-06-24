@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, render::camera::{RenderTarget, Viewport}};
+use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, render::{camera::{RenderTarget, Viewport}}};
 use crate::{components::*, physics::PhysicsSystemSet, resources::MainRenderTexture};
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
@@ -36,6 +36,7 @@ pub fn spawn_player_and_cameras(
 		AngularVelocity(Vec3::ZERO), AngularVelocityDrag(0.1),
 		SpatialBundle::default()
 	))
+	.insert(Name::new("Player"))
 	.with_children(|player_holder| {
 		// Visible player object
 		player_holder
@@ -56,9 +57,10 @@ pub fn spawn_player_and_cameras(
 			camera_3d: Camera3d {clear_color: ClearColorConfig::None, ..Default::default()},
 			transform: Transform::from_translation(Vec3::new(0.0, 2.0, 8.0)).looking_at(Vec3::ZERO, Vec3::Y),
 			..Default::default()
-		});
+		})
+		.insert(Name::new("3rd Person Camera"));
 		// Unrotated transform
-		player_holder.spawn((PlayerHarness, SpatialBundle::default()))
+		player_holder.spawn((PlayerHarness, SpatialBundle::default())).insert(Name::new("Orthocams"))
 		.with_children(|parent| {
 			// Orthocams
 			parent.spawn(Camera3dBundle {
@@ -71,7 +73,8 @@ pub fn spawn_player_and_cameras(
 				camera_3d: Camera3d {clear_color: ClearColorConfig::None, ..Default::default()},
 				transform: Transform::from_translation(10.0 * Vec3::Z).looking_at(Vec3::ZERO, Vec3::Y),
 				..Default::default()
-			});
+			})
+			.insert(Name::new("Front View Camera"));
 			parent.spawn(Camera3dBundle {
 				camera: Camera {
 					viewport: Some(Viewport {physical_position: half_size, physical_size: half_size, ..Default::default()}),
@@ -82,7 +85,8 @@ pub fn spawn_player_and_cameras(
 				camera_3d: Camera3d {clear_color: ClearColorConfig::None, ..Default::default()},
 				transform: Transform::from_translation(10.0 * Vec3::Y).looking_at(Vec3::ZERO, Vec3::X),
 				..Default::default()
-			});
+			})
+			.insert(Name::new("Top Down View Camera"));
 			parent.spawn(Camera3dBundle {
 				camera: Camera {
 					viewport: Some(Viewport {physical_position: UVec2::new(0, half_size.y), physical_size: half_size, ..Default::default()}),
@@ -93,7 +97,8 @@ pub fn spawn_player_and_cameras(
 				camera_3d: Camera3d {clear_color: ClearColorConfig::None, ..Default::default()},
 				transform: Transform::from_translation(10.0 * Vec3::X).looking_at(Vec3::ZERO, Vec3::Z),
 				..Default::default()
-			});
+			})
+			.insert(Name::new("Side View Camera"));
 		});
 	});
 }
