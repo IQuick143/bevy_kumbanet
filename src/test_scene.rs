@@ -2,14 +2,16 @@ use bevy::prelude::*;
 
 use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
 
-use crate::components::AngularVelocity;
+use crate::physics::PhysicsSystemSet;
+use crate::prelude::*;
 
 pub struct SetupPlugin {}
 
 impl Plugin for SetupPlugin {
 	fn build(&self, app: &mut App) {
 		app
-		.add_startup_system(scene_setup);
+		.add_startup_system(scene_setup)
+		.add_system(player_interaction.after(PhysicsSystemSet));
 	}
 }
 
@@ -37,12 +39,16 @@ fn scene_setup(
 
 	let cube = meshes.add(shape::Cube::default().into());
 
-	commands.spawn(PbrBundle {
-		mesh: cube,
-		material: material,
-		transform: Transform::from_xyz(0.0, 2.0, 0.0),
-		..default()
-	}).insert(AngularVelocity(Vec3::Y));
+	commands.spawn((
+		Interactable {radius: 1.0},
+		AngularVelocity(Vec3::Y),
+		PbrBundle {
+			mesh: cube,
+			material: material,
+			transform: Transform::from_xyz(0.0, 2.0, 0.0),
+			..default()
+		}
+	));
 
 	commands.spawn(PointLightBundle {
 		point_light: PointLight {
@@ -94,4 +100,12 @@ fn generate_texture() -> Image {
 		&texture_data,
 		TextureFormat::Rgba8UnormSrgb,
 	)
+}
+
+fn player_interaction(
+	mut events: EventReader<PlayerInteractionEvent>
+) {
+	for _e in events.iter() {
+		println!("Player is hitting smth!!!");
+	}
 }

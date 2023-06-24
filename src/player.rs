@@ -1,7 +1,7 @@
 use std::f32::consts::PI;
 
-use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, render::{camera::{RenderTarget, Viewport}}};
-use crate::{components::*, physics::PhysicsSystemSet, resources::MainRenderTexture};
+use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, render::camera::{RenderTarget, Viewport}};
+use crate::{prelude::*, physics::PhysicsSystemSet};
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct PlayerHarness;

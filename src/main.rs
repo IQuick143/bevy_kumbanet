@@ -1,5 +1,11 @@
 use bevy::prelude::*;
 
+mod prelude {
+	pub use crate::resources::*;
+	pub use crate::components::*;
+	pub use crate::events::*;
+}
+
 mod post_processing;
 mod components;
 mod controls;
@@ -7,6 +13,7 @@ mod test_scene;
 mod resources;
 mod physics;
 mod player;
+mod events;
 mod vfx;
 
 #[cfg(debug_assertions)]
