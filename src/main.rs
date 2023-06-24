@@ -1,4 +1,4 @@
-use bevy::{prelude::*, winit::WinitPlugin};
+use bevy::prelude::*;
 
 mod post_processing;
 mod components;

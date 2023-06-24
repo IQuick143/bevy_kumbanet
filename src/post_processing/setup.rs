@@ -15,8 +15,8 @@ use super::{PostProcessingEffect, PostProcessingEffectMaterial, EffectAssociated
 pub struct VFXPlugin {}
 
 impl Plugin for VFXPlugin {
-	fn build(&self, app: &mut App) {
-		app;
+	fn build(&self, _app: &mut App) {
+		
 	}
 }
 
