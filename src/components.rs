@@ -23,3 +23,6 @@ pub struct AngularVelocityDrag(pub f32);
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct Hand;
+
+#[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
+pub struct Thought;

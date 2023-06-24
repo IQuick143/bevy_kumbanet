@@ -13,6 +13,7 @@ mod test_scene;
 mod resources;
 mod physics;
 mod player;
+mod thoughts;
 mod events;
 mod vfx;
 
@@ -43,6 +44,7 @@ fn main() {
 		.add_plugin(controls::ControlsPlugin {})
 		.add_plugin(physics::PhysicsPlugin {})
 		.add_plugin(player::PlayerBehaviourPlugin {})
+		.add_plugin(thoughts::ThoughtsPlugin {})
 		.add_plugin(test_scene::SetupPlugin {})
 		.add_plugin(vfx::VFXPlugin {})
 		.add_startup_system(player::spawn_player_and_cameras)
