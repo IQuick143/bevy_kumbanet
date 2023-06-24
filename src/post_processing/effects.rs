@@ -28,7 +28,7 @@ pub mod test {
 			Effect { material_handle: handle }
 		}
 	
-		fn update_info(&self, material: &mut Self::MaterialType) {
+		fn update_info(&self, _material: &mut Self::MaterialType) {
 			//todo!()
 		}
 	
@@ -95,7 +95,7 @@ pub mod flip {
 			Effect { material_handle: handle }
 		}
 	
-		fn update_info(&self, material: &mut Self::MaterialType) {
+		fn update_info(&self, _material: &mut Self::MaterialType) {
 			//todo!()
 		}
 	
@@ -152,7 +152,7 @@ pub mod jpeg {
 			Encode { material_handle: handle }
 		}
 	
-		fn update_info(&self, material: &mut Self::MaterialType) {
+		fn update_info(&self, _material: &mut Self::MaterialType) {
 			//todo!()
 		}
 	
@@ -205,7 +205,7 @@ pub mod jpeg {
 			Decode { material_handle: handle }
 		}
 
-		fn update_info(&self, material: &mut Self::MaterialType) {
+		fn update_info(&self, _material: &mut Self::MaterialType) {
 			//todo!()
 		}
 
@@ -262,7 +262,7 @@ pub mod dither {
 			Effect { material_handle: handle }
 		}
 	
-		fn update_info(&self, material: &mut Self::MaterialType) {
+		fn update_info(&self, _material: &mut Self::MaterialType) {
 			//todo!()
 		}
 	
