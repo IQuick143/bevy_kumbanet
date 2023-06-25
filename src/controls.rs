@@ -18,8 +18,6 @@ impl Plugin for ControlsPlugin {
 	}
 }
 
-
-
 fn spawn_hand(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
