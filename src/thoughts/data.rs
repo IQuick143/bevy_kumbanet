@@ -14,10 +14,10 @@ const NO_SOUND: Option::<String> = None;
 impl ThoughtLibrary {
 	pub fn new() -> Self {
 		ThoughtLibrary {data: vec![
-			Thought::new("thoughts/images/debug/1.png",  NO_SOUND, 1, Positive, Noun("".into())),
-			Thought::new("thoughts/images/debug/-1.png", NO_SOUND, 1, Negative, Noun("".into())),
-			Thought::new("thoughts/images/debug/2.png",  NO_SOUND, 2, Positive, Noun("".into())),
-			Thought::new("thoughts/images/debug/-2.png", NO_SOUND, 2, Negative, Noun("".into())),
+			Thought::new("thoughts/images/debug/1.png",  NO_SOUND, 1, Positive, Noun("1".into())),
+			Thought::new("thoughts/images/debug/-1.png", NO_SOUND, 1, Negative, Noun("-1".into())),
+			Thought::new("thoughts/images/debug/2.png",  NO_SOUND, 2, Positive, Noun("2".into())),
+			Thought::new("thoughts/images/debug/-2.png", NO_SOUND, 2, Negative, Noun("-2".into())),
 		]}
 	}
 

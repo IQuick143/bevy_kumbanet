@@ -29,11 +29,10 @@ pub fn spawn_thoughts(
 		let thought = thoughts.get_thought_by_index(thought_id % thoughts.n_thoughts());
 
 		let (x, y, z) = rng.gen();
-		let thought = spawn_thought(
+		let _thought = spawn_thought(
 			&mut commands, &mut mesh, &mut materials, &asset_server,
 			thought, (Vec3::new(x, y, z) - 0.5) * 100.0
 		);
-		commands.entity(thought).insert(Name::new("Cringe"));
 	}
 }
 
@@ -46,6 +45,7 @@ fn spawn_thought(
 	location: Vec3,
 ) -> Entity {
 	commands.spawn((
+		Name::new(format!("Thought {:?}@[{:.1};{:.1};{:.1}]", thought.word, location.x, location.y, location.z)),
 		MaterialMeshBundle {
 			mesh: mesh.add(Mesh::from(shape::Cube::default())),
 			material: materials.add(thought.create_material(&asset_server)),
