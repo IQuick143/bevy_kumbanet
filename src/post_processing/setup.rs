@@ -6,7 +6,7 @@
 use bevy::{
 	prelude::*,
 	render::{view::RenderLayers, render_resource::{Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages},
-	texture::BevyDefault, camera::RenderTarget}, sprite::MaterialMesh2dBundle,
+	texture::BevyDefault, camera::{RenderTarget, ScalingMode}}, sprite::MaterialMesh2dBundle,
 };
 
 use super::{PostProcessingEffect, PostProcessingEffectMaterial, EffectAssociatedCameraID};
@@ -37,9 +37,9 @@ pub fn spawn_effect<Effect: PostProcessingEffect>(
 	output: EffectOutput,
 ) -> Entity {
 	let size = match output.clone() {
-		EffectOutput::Window {output_window} => Extent3d {
-			width: output_window.resolution.physical_width(),
-			height: output_window.resolution.physical_height(),
+		EffectOutput::Window {output_window: _} => Extent3d {
+			width: 1280,
+			height: 720,
 			..default()
 		},
 		EffectOutput::Texture {width, height} => Extent3d {
@@ -95,6 +95,10 @@ pub fn spawn_effect<Effect: PostProcessingEffect>(
 				order: 1,
 				target: render_target,
 				..default()
+			},
+			projection: OrthographicProjection {
+				scaling_mode: ScalingMode::Fixed {width: size.width as f32, height: size.height as f32},
+				..Default::default()
 			},
 			..Camera2dBundle::default()
 		},
