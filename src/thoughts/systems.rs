@@ -67,3 +67,20 @@ pub fn rotate_thoughts(
 		thought_transform.look_at(-player_transform.translation, Vec3::Y);
 	}
 }
+
+pub fn collect_thoughts(
+	mut commands: Commands,
+	players: Query<Entity, With<Player>>,
+	thoughts: Query<(Entity, &Thought), Without<Player>>,
+	mut collisions: EventReader<PlayerInteractionEvent>,
+	mut banana: EventWriter<ThoughtCollectedEvent>
+) {
+	for event in collisions.iter() {
+		if let (Ok(player), Ok(thought)) = (players.get(event.player), thoughts.get(event.other)) {
+			commands.entity(thought.0).despawn_recursive();
+			banana.send(ThoughtCollectedEvent {
+				player, thought: thought.1.clone()
+			});
+		}
+	}
+}
