@@ -1,27 +1,15 @@
 use bevy::prelude::*;
+use crate::prelude::*;
 use rand::Rng;
 
-use crate::prelude::{Thought, Player, Interactable};
+use super::data::ThoughtLibrary;
 
-pub struct ThoughtsPlugin;
-
-impl Plugin for ThoughtsPlugin {
-	fn build(&self, app: &mut App) {
-		app
-		.add_startup_systems((
-			spawn_thoughts,
-		))
-		.add_systems((
-			rotate_thoughts,
-		));
-	}
-}
-
-fn spawn_thoughts(
+pub fn spawn_thoughts(
 	mut commands: Commands,
 	mut mesh: ResMut<Assets<Mesh>>,
 	mut materials: ResMut<Assets<StandardMaterial>>,
 	asset_server: Res<AssetServer>,
+	thoughts: Res<ThoughtLibrary>,
 ) {
 	/*commands.spawn((MaterialMeshBundle {
 		mesh: mesh.add(Mesh::from(shape::Quad::default())),
@@ -34,11 +22,17 @@ fn spawn_thoughts(
 		Thought,
 	))
 	.insert(Name::new("Thought"));*/
-
+	
 	let mut rng = rand::thread_rng();
 	for _ in 1..100 {
+		let thought_id: usize = rng.gen();
+		let thought = thoughts.get_thought_by_index(thought_id % thoughts.n_thoughts());
+
 		let (x, y, z) = rng.gen();
-		let thought = spawn_thought(&mut commands, &mut mesh, &mut materials, &asset_server, (Vec3::new(x, y, z) - 0.5) * 100.0);
+		let thought = spawn_thought(
+			&mut commands, &mut mesh, &mut materials, &asset_server,
+			thought, (Vec3::new(x, y, z) - 0.5) * 100.0
+		);
 		commands.entity(thought).insert(Name::new("Cringe"));
 	}
 }
@@ -48,24 +42,23 @@ fn spawn_thought(
 	mesh: &mut ResMut<Assets<Mesh>>,
 	materials: &mut ResMut<Assets<StandardMaterial>>,
 	asset_server: &Res<AssetServer>,
+	thought: Thought,
 	location: Vec3,
 ) -> Entity {
-	commands.spawn((MaterialMeshBundle {
-		mesh: mesh.add(Mesh::from(shape::Torus::default())),
-		material: materials.add(StandardMaterial {
-			base_color_texture: Some(asset_server.load("ui/hand.png")),
+	commands.spawn((
+		MaterialMeshBundle {
+			mesh: mesh.add(Mesh::from(shape::Cube::default())),
+			material: materials.add(thought.create_material(&asset_server)),
+			transform: Transform::from_translation(location),
 			..default()
-		}),
-		transform: Transform::from_translation(location),
-		..default()
 		},
-		Thought,
+		thought,
 		Interactable {radius: 1.0},
 	))
 	.id()
 }
 
-fn rotate_thoughts(
+pub fn rotate_thoughts(
 	mut thoughts_query: Query<&mut Transform, With<Thought>>,
 	player_query: Query<&Transform, (With<Player>, Without<Thought>)>,
 ) {

@@ -8,12 +8,12 @@ mod prelude {
 
 mod post_processing;
 mod components;
-mod controls;
 mod test_scene;
 mod resources;
+mod thoughts;
+mod controls;
 mod physics;
 mod player;
-mod thoughts;
 mod events;
 mod vfx;
 
