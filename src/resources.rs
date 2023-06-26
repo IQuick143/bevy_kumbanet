@@ -1,5 +1,11 @@
 use bevy::{prelude::*, render::{render_resource::{TextureDescriptor, TextureDimension, TextureFormat, TextureUsages, Extent3d}, texture::BevyDefault}};
 
+#[derive(Resource, PartialEq, Debug, Clone, Default)]
+pub struct CursorCabinPosition {
+	pub world_position: Vec2,
+	pub uv_position: Vec2,
+}
+
 // Texture all the gameplay cameras render to, gets then chewed up by post-proc
 #[derive(Resource, Eq, PartialEq, Debug, Clone)]
 pub struct MainRenderTexture {

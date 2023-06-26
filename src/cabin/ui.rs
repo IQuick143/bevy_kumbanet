@@ -22,15 +22,16 @@ fn spawn_hand(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
 ) {
-	commands.spawn((SpriteBundle {
-		texture: asset_server.load("ui/hand.png"),
-		transform: Transform::from_translation(Vec3::new(1000.0, 1000.0, 0.0)),
-		..Default::default()
-	},
-	Hand
-	))
-	.insert(RenderLayers::layer(1))
-	.insert(Name::new("Hand"));
+	commands.spawn((
+		SpriteBundle {
+			texture: asset_server.load("ui/hand.png"),
+			transform: Transform::from_translation(Vec3::new(1000.0, 1000.0, 0.0)),
+			..Default::default()
+		},
+		Hand,
+		RenderLayers::layer(1),
+		Name::new("Hand"),
+	));
 }
 
 fn spawn_hand_camera(
