@@ -1,4 +1,4 @@
-use bevy::{prelude::*, render::{view::RenderLayers, camera::{RenderTarget, ScalingMode}}, core_pipeline::clear_color::ClearColorConfig, input::mouse::MouseMotion};
+use bevy::{prelude::*, render::{view::RenderLayers, camera::{RenderTarget, ScalingMode}}, core_pipeline::clear_color::ClearColorConfig};
 
 use crate::prelude::*;
 
@@ -15,6 +15,7 @@ impl Plugin for CabinPlugin {
 		.add_systems((
 			update_cursor_position,
 			track_cursor,
+			spawn_collected_thoughts,
 		).chain())
 		;
 	}
@@ -66,6 +67,34 @@ fn spawn_cabin(
 		RenderLayers::layer(1),
 		Name::new("Hand"),
 		Hand,
+	));
+}
+
+fn spawn_collected_thoughts(
+	mut commands: Commands,
+	assets: Res<AssetServer>,
+	mut collected_thoughts: EventReader<ThoughtCollectedEvent>,
+) {
+	for ThoughtCollectedEvent {player: _, thought} in collected_thoughts.iter() {
+		spawn_cabin_thought(&mut commands, &assets, thought.clone());
+	}
+}
+
+fn spawn_cabin_thought(
+	commands: &mut Commands,
+	assets: &AssetServer,
+	thought: Thought,
+) {
+	commands.spawn((
+		SpriteBundle {
+			sprite: Sprite {custom_size: Some(Vec2::new(1.0, 1.0)), ..Default::default()},
+			texture: thought.load_image(assets),
+			transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+			..Default::default()
+		},
+		RenderLayers::layer(1),
+		Name::new(format!("CabinThought {:?}", thought.word)),
+		CabinThougt(thought),
 	));
 }
 

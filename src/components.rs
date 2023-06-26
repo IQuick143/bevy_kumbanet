@@ -28,5 +28,8 @@ pub struct Hand;
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct CabinCamera;
 
+#[derive(Component, Eq, PartialEq, Debug, Clone)]
+pub struct CabinThougt(pub Thought);
+
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct ClearCamera(pub bool);
