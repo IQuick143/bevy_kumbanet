@@ -94,7 +94,7 @@ fn spawn_cabin_thought(
 		},
 		RenderLayers::layer(1),
 		Name::new(format!("CabinThought {:?}", thought.word)),
-		CabinThougt(thought),
+		CabinThought(thought),
 	));
 }
 

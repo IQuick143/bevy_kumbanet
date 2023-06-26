@@ -29,7 +29,7 @@ pub struct Hand;
 pub struct CabinCamera;
 
 #[derive(Component, Eq, PartialEq, Debug, Clone)]
-pub struct CabinThougt(pub Thought);
+pub struct CabinThought(pub Thought);
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct ClearCamera(pub bool);
