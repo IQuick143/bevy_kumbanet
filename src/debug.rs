@@ -2,7 +2,7 @@ use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig};
 #[cfg(debug_assertions)]
 use bevy_editor_pls::EditorPlugin;
 
-use crate::prelude::ClearCamera;
+use crate::{prelude::{ClearCamera, ThoughtCollectedEvent, Player}, thoughts::data::ThoughtLibrary};
 pub struct DebugPlugin;
 
 impl Plugin for DebugPlugin {
@@ -13,6 +13,7 @@ impl Plugin for DebugPlugin {
 			.add_plugin(bevy::diagnostic::EntityCountDiagnosticsPlugin)
 			.add_systems((
 				clear_on_refresh,
+				give_random_thought,
 			))
 		;
 	}
@@ -30,5 +31,20 @@ fn clear_on_refresh(
 			camera.clear_color = ClearColorConfig::None;
 		}
 		clear_toggle.0 = !clear_toggle.0;
+	}
+}
+
+fn give_random_thought(
+	keyboard: Res<Input<KeyCode>>,
+	player: Query<Entity, With<Player>>,
+	thoughts: Res<ThoughtLibrary>,
+	mut event: EventWriter<ThoughtCollectedEvent>
+) {
+	if keyboard.just_pressed(KeyCode::G) {
+		let mut rng = rand::thread_rng();
+		event.send(ThoughtCollectedEvent {
+		    player: player.single(),
+		    thought: thoughts.get_thought_by_index(rand::Rng::gen::<usize>(&mut rng) % thoughts.n_thoughts()),
+		});
 	}
 }

@@ -99,30 +99,45 @@ fn spawn_cabin_thought(
 		RenderLayers::layer(1),
 		Name::new(format!("CabinThought {:?}", thought.word)),
 		Velocity(Vec3::new(1.0,1.0,0.0)),
+		VelocityDrag(0.05),
 		CabinThought(thought),
 	));
 }
 
 fn move_cabin_thoughts(
 	mut cabin_thought_query: Query<(&mut Transform, &mut Velocity), With<CabinThought>>,
+	angular_velocity_query: Query<&AngularVelocity, With<Player>>,
 	mouse_pos: Res<CursorCabinPosition>,
 	inputs: Res<Input<MouseButton>>,
 	time: Res<Time>
 ) {
+	let angular_velocity = if let Ok(angular) = angular_velocity_query.get_single() {
+		angular.length()
+	} else {0.0};
+
 	for (mut transform, mut velocity) in cabin_thought_query.iter_mut() {
+		let mut colliding = false;
 		if transform.translation.x < -CABIN_WIDTH / 2.0 && velocity.x < 0.0 {
 			transform.translation = Vec3::new(-CABIN_WIDTH / 2.0, transform.translation.y, transform.translation.z);
 			velocity.0 = Vec3::new(-velocity.x, velocity.y, velocity.z);
+			colliding = true;
 		} else if transform.translation.x > CABIN_WIDTH / 2.0 && velocity.x > 0.0 {
 			transform.translation = Vec3::new(CABIN_WIDTH / 2.0, transform.translation.y, transform.translation.z);
 			velocity.0 = Vec3::new(-velocity.x, velocity.y, velocity.z);
+			colliding = true;
 		}
 		if transform.translation.y < -CABIN_HEIGHT / 2.0 && velocity.y < 0.0 {
 			transform.translation = Vec3::new(transform.translation.x, -CABIN_HEIGHT / 2.0, transform.translation.z);
 			velocity.0 = Vec3::new(velocity.x, -velocity.y, velocity.z);
+			colliding = true;
 		} else if transform.translation.y > CABIN_HEIGHT / 2.0 && velocity.y > 0.0 {
 			transform.translation = Vec3::new(transform.translation.x, CABIN_HEIGHT / 2.0, transform.translation.z);
 			velocity.0 = Vec3::new(velocity.x, -velocity.y, velocity.z);
+			colliding = true;
+		}
+		if !colliding {
+			let r = transform.translation.xy().extend(0.0);
+			velocity.0 += time.delta_seconds() * 0.1 * angular_velocity * angular_velocity * r;
 		}
 	}
 
