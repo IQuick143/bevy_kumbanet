@@ -6,6 +6,14 @@ pub struct CursorCabinPosition {
 	pub uv_position: Vec2,
 }
 
+#[derive(Resource, PartialEq, Debug, Clone, Copy)]
+pub struct ThoughtSpawnParameters {
+	pub far_radius: f32,
+	pub close_radius: f32,
+	pub despawn_radius: f32,
+	pub total_to_spawn: u32,
+}
+
 // Texture all the gameplay cameras render to, gets then chewed up by post-proc
 #[derive(Resource, Eq, PartialEq, Debug, Clone)]
 pub struct MainRenderTexture {

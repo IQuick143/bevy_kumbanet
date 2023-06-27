@@ -3,9 +3,9 @@ use bevy::prelude::*;
 pub mod data;
 mod systems;
 
-use crate::{prelude::ThoughtCollectedEvent, physics::PhysicsSystemSet};
+use crate::{prelude::*, physics::PhysicsSystemSet};
 
-use self::{systems::{spawn_thoughts, rotate_thoughts, collect_thoughts}, data::ThoughtLibrary};
+use self::{systems::*, data::ThoughtLibrary};
 
 pub struct ThoughtsPlugin;
 
@@ -13,13 +13,18 @@ impl Plugin for ThoughtsPlugin {
 	fn build(&self, app: &mut App) {
 		app
 		.init_resource::<ThoughtLibrary>()
+		.insert_resource(ThoughtSpawnParameters {
+			far_radius: 100.0,
+			close_radius: 50.0,
+			total_to_spawn: 500,
+		    despawn_radius: 150.0,
+		})
 		.add_event::<ThoughtCollectedEvent>()
-		.add_startup_systems((
-			spawn_thoughts,
-		))
 		.add_systems((
+			spawn_thoughts,
 			rotate_thoughts,
 			collect_thoughts,
+			despawn_thoughts,
 		).after(PhysicsSystemSet));
 	}
 }

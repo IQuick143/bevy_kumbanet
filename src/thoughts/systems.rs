@@ -8,31 +8,46 @@ pub fn spawn_thoughts(
 	mut commands: Commands,
 	mut mesh: ResMut<Assets<Mesh>>,
 	mut materials: ResMut<Assets<StandardMaterial>>,
+	thoughts_entites: Query<Entity, With<Thought>>,
+	player_transform: Query<&Transform, With<Player>>,
 	asset_server: Res<AssetServer>,
 	thoughts: Res<ThoughtLibrary>,
+	spawn: Res<ThoughtSpawnParameters>,
 ) {
-	/*commands.spawn((MaterialMeshBundle {
-		mesh: mesh.add(Mesh::from(shape::Quad::default())),
-		material: materials.add(StandardMaterial {
-			base_color_texture: Some(asset_server.load("ui/hand.png")),
-			..default()
-		}),
-		..default()
-		},
-		Thought,
-	))
-	.insert(Name::new("Thought"));*/
-	
+	let mut already_spawned = thoughts_entites.iter().count() as u32;
+
+	let player_position = if let Ok(player) = player_transform.get_single() {
+		player.translation
+	} else {
+		Vec3::ZERO
+	};
+
+	let mut spawning_capacity = 10;
 	let mut rng = rand::thread_rng();
-	for _ in 1..100 {
+	while spawn.total_to_spawn > already_spawned && spawning_capacity > 0 {
+		spawning_capacity -= 1;
 		let thought_id: usize = rng.gen();
 		let thought = thoughts.get_thought_by_index(thought_id % thoughts.n_thoughts());
-
-		let (x, y, z) = rng.gen();
-		let _thought = spawn_thought(
-			&mut commands, &mut mesh, &mut materials, &asset_server,
-			thought, (Vec3::new(x, y, z) - 0.5) * 100.0
-		);
+		let location = player_position +
+		if spawn.far_radius * spawn.far_radius > 2.0 * spawn.close_radius * spawn.close_radius {
+			loop {
+				let x = (2.0 * rng.gen::<f32>() - 1.0) * spawn.far_radius;
+				let y = (2.0 * rng.gen::<f32>() - 1.0) * spawn.far_radius;
+				let z = (2.0 * rng.gen::<f32>() - 1.0) * spawn.far_radius;
+				let r2 = x*x+y*y+z*z;
+				if r2 <= spawn.far_radius * spawn.far_radius && r2 >= spawn.close_radius * spawn.close_radius {
+					break Vec3::new(x,y,z);
+				}
+			}
+		} else {
+			warn!("Spawning far radius and close radius are very close to each other, RNG might converge slowly");
+			let x = (2.0 * rng.gen::<f32>() - 1.0) * spawn.far_radius;
+			let y = (2.0 * rng.gen::<f32>() - 1.0) * spawn.far_radius;
+			let z = (2.0 * rng.gen::<f32>() - 1.0) * spawn.far_radius;
+			Vec3::new(x,y,z)
+		};
+		spawn_thought(&mut commands, &mut mesh, &mut materials, &asset_server, thought, location);
+		already_spawned += 1;
 	}
 }
 
@@ -81,6 +96,21 @@ pub fn collect_thoughts(
 			banana.send(ThoughtCollectedEvent {
 				player, thought: thought.1.clone()
 			});
+		}
+	}
+}
+
+pub fn despawn_thoughts(
+	mut commands: Commands,
+	thoughts_entites: Query<(Entity, &Transform), With<Thought>>,
+	player_transform: Query<&Transform, With<Player>>,
+	despawn: Res<ThoughtSpawnParameters>,
+) {
+	if let Ok(player_transform) = player_transform.get_single() {
+		for (entity, transform) in thoughts_entites.iter() {
+			if (transform.translation - player_transform.translation).length() > despawn.despawn_radius {
+				commands.entity(entity).despawn_recursive();
+			}
 		}
 	}
 }
