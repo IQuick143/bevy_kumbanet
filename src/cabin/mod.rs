@@ -2,6 +2,8 @@ use bevy::{prelude::*, render::{view::RenderLayers, camera::{RenderTarget, Scali
 
 use crate::prelude::*;
 
+mod ui;
+
 pub const CABIN_WIDTH: f32 = 16.0;
 pub const CABIN_HEIGHT: f32 = 9.0;
 
@@ -11,15 +13,17 @@ impl Plugin for CabinPlugin {
 	fn build(&self, app: &mut App) {
 		app
 		.init_resource::<CursorCabinPosition>()
+		.add_event::<ButtonPressEvent>()
 		.add_startup_systems((
 			spawn_cabin_camera,
-			spawn_cabin,
+			ui::spawn_ui,
 		))
 		.add_systems((
 			update_cursor_position,
-			track_cursor,
+			ui::track_cursor,
 			spawn_collected_thoughts,
 			move_cabin_thoughts,
+			ui::check_buttons,
 		).chain())
 		;
 	}
@@ -43,34 +47,6 @@ fn spawn_cabin_camera(
 		CabinCamera,
 		RenderLayers::layer(1),
 		Name::new("Cabin Camera"),
-	));
-}
-
-fn spawn_cabin(
-	mut commands: Commands,
-	asset_server: Res<AssetServer>,
-) {
-	commands.spawn((
-		SpriteBundle {
-			sprite: Sprite {custom_size: Some(Vec2::new(CABIN_WIDTH, CABIN_HEIGHT)), ..Default::default()},
-			texture: asset_server.load("ui/hud.png"),
-			transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
-			..Default::default()
-		},
-		RenderLayers::layer(1),
-		Name::new("HUD"),
-	));
-
-	commands.spawn((
-		SpriteBundle {
-			sprite: Sprite {custom_size: Some(Vec2::new(0.5, 0.5)), ..Default::default()},
-			texture: asset_server.load("thoughts/images/debug/2.png"),
-			transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
-			..Default::default()
-		},
-		RenderLayers::layer(1),
-		Name::new("Hand"),
-		Hand,
 	));
 }
 
@@ -149,15 +125,6 @@ fn move_cabin_thoughts(
 				velocity.0 += -(time.delta_seconds() * 3.0 / r_square) * r.normalize()
 			}
 		}
-	}
-}
-
-fn track_cursor(
-	mut cursor_sprite: Query<&mut Transform, With<Hand>>,
-	cursor: Res<CursorCabinPosition>,
-) {
-	for mut sprite in cursor_sprite.iter_mut() {
-		sprite.translation = cursor.world_position.extend(sprite.translation.z);
 	}
 }
 

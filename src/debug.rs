@@ -2,7 +2,7 @@ use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig};
 #[cfg(debug_assertions)]
 use bevy_editor_pls::EditorPlugin;
 
-use crate::{prelude::{ClearCamera, ThoughtCollectedEvent, Player}, thoughts::data::ThoughtLibrary};
+use crate::{prelude::*, thoughts::data::ThoughtLibrary};
 pub struct DebugPlugin;
 
 impl Plugin for DebugPlugin {
@@ -14,6 +14,7 @@ impl Plugin for DebugPlugin {
 			.add_systems((
 				clear_on_refresh,
 				give_random_thought,
+				debug_buttons,
 			))
 		;
 	}
@@ -46,5 +47,13 @@ fn give_random_thought(
 		    player: player.single(),
 		    thought: thoughts.get_thought_by_index(rand::Rng::gen::<usize>(&mut rng) % thoughts.n_thoughts()),
 		});
+	}
+}
+
+pub fn debug_buttons(
+	mut click_events: EventReader<ButtonPressEvent>
+) {
+	for e in click_events.iter() {
+		println!("Button {:?} pressed", e.button_type);
 	}
 }

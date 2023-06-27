@@ -11,3 +11,13 @@ pub struct PlayerInteractionEvent {
 	pub player: Entity,
 	pub other: Entity
 }
+
+pub struct ButtonPressEvent {
+	pub button: Entity,
+	pub button_type: ButtonType
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum ButtonType {
+	MergeThoughts
+}

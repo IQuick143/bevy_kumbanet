@@ -31,5 +31,11 @@ pub struct CabinCamera;
 #[derive(Component, Eq, PartialEq, Debug, Clone)]
 pub struct CabinThought(pub Thought);
 
+#[derive(Component, PartialEq, Debug, Clone, Copy)]
+pub struct CabinButton {
+	pub button: crate::prelude::ButtonType,
+	pub half_extent: Vec2,
+}
+
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct ClearCamera(pub bool);

@@ -1,74 +1,74 @@
-use bevy::{prelude::*, render::{view::RenderLayers, camera::{Viewport, RenderTarget}}, core_pipeline::clear_color::ClearColorConfig};
+use bevy::{prelude::*, render::view::RenderLayers, math::Vec3Swizzles};
 
-use crate::{resources::MainRenderTexture, components::Hand};
+use crate::prelude::*;
 
-pub struct ControlsPlugin;
+use super::{CABIN_WIDTH, CABIN_HEIGHT};
 
-impl Plugin for ControlsPlugin {
-	fn build(&self, app: &mut App) {
-		app
-		.add_startup_systems((
-			spawn_hand,
-			spawn_hand_camera,
-		))
-		.add_systems((
-			move_hand,
-		))
-		;
-	}
-}
-
-fn spawn_hand(
+pub fn spawn_ui(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
 ) {
 	commands.spawn((
 		SpriteBundle {
-			texture: asset_server.load("ui/hand.png"),
-			transform: Transform::from_translation(Vec3::new(1000.0, 1000.0, 0.0)),
+			sprite: Sprite {custom_size: Some(Vec2::new(CABIN_WIDTH, CABIN_HEIGHT)), ..Default::default()},
+			texture: asset_server.load("ui/hud.png"),
+			transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
 			..Default::default()
 		},
-		Hand,
+		RenderLayers::layer(1),
+		Name::new("HUD"),
+	));
+
+	commands.spawn((
+		SpriteBundle {
+			sprite: Sprite {custom_size: Some(Vec2::new(0.5, 0.5)), ..Default::default()},
+			texture: asset_server.load("thoughts/images/debug/2.png"),
+			transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+			..Default::default()
+		},
 		RenderLayers::layer(1),
 		Name::new("Hand"),
+		Hand,
+	));
+
+	let button_size = Vec2::new(2.0, 2.0);
+	commands.spawn((
+		SpriteBundle {
+			sprite: Sprite {custom_size: Some(button_size), ..Default::default()},
+			texture: asset_server.load("thoughts/images/debug/-1.png"),
+			transform: Transform::from_translation(Vec3::new(-7.0, -3.5, 0.0)),
+			..Default::default()
+		},
+		RenderLayers::layer(1),
+		Name::new("Merge Button"),
+		CabinButton {
+		    button: ButtonType::MergeThoughts,
+		    half_extent: button_size / 2.0,
+		},
 	));
 }
 
-fn spawn_hand_camera(
-	mut commands: Commands,
-	render_target: Res<MainRenderTexture>,
+pub fn track_cursor(
+	mut cursor_sprite: Query<&mut Transform, With<Hand>>,
+	cursor: Res<CursorCabinPosition>,
 ) {
-	let size = UVec2::new(render_target.width, render_target.height);
-	commands.spawn(Camera2dBundle {
-		camera: Camera {
-			viewport: Some(Viewport {physical_position: UVec2::new(0, 0 /*size.x/2, size.y/2*/), physical_size: size, ..Default::default()}),
-			target: RenderTarget::Image(render_target.texture.clone()),
-			order: 10, is_active: true, ..Default::default()
-		},
-		camera_2d: Camera2d {clear_color: ClearColorConfig::None, ..Default::default()},
-		..Default::default()
-	})
-	.insert(RenderLayers::layer(1))
-	.insert(Name::new("Hand Camera"));
+	for mut sprite in cursor_sprite.iter_mut() {
+		sprite.translation = cursor.world_position.extend(sprite.translation.z);
+	}
 }
 
-fn move_hand(
-	window_query: Query<&Window>,
-	mut hand_query: Query<&mut Transform, With<Hand>>,
+pub fn check_buttons(
+	buttons: Query<(Entity, &Transform, &CabinButton)>,
+	cursor: Res<CursorCabinPosition>,
+	mouse: Res<Input<MouseButton>>,
+	mut click_events: EventWriter<ButtonPressEvent>
 ) {
-	let window = window_query.get_single().unwrap();
-	let mut transform = hand_query.get_single_mut().unwrap();
-
-	if let Some(current_pos) = window.cursor_position() {
-		let sprite_height = 32.0;
-		let normalised_cursor_pos = Vec2::new(current_pos.x - window.width() / 2.0, current_pos.y - window.height() / 2.0);
-		let root_pos = Vec2::new(0.0, -window.height() / 2.0);
-		transform.translation.x = (normalised_cursor_pos.x + root_pos.x) / 2.0;
-		transform.translation.y = (normalised_cursor_pos.y + root_pos.y) / 2.0;
-
-		let direction = (normalised_cursor_pos - root_pos).normalize();
-
-		transform.rotation = Quat::from_rotation_arc(Vec3::Y, direction.extend(0.0));
-		transform.scale.y = normalised_cursor_pos.distance(root_pos) / sprite_height;
+	if mouse.just_pressed(MouseButton::Left) {
+		for (entity, transform, button) in buttons.iter() {
+			let offset = (cursor.world_position - transform.translation.xy()).abs();
+			if offset.x <= button.half_extent.x && offset.y <= button.half_extent.y {
+				click_events.send(ButtonPressEvent {button: entity, button_type: button.button});
+			}
+		}
 	}
 }
