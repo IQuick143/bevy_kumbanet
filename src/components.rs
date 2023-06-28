@@ -38,6 +38,9 @@ pub struct Curtain{
 }
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
+pub struct CabinCutsceneDirector;
+
+#[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct CabinCamera;
 
 #[derive(Component, Eq, PartialEq, Debug, Clone)]

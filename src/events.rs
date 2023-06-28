@@ -21,6 +21,8 @@ pub struct ButtonPressEvent {
 	pub button_type: ButtonType
 }
 
+pub struct ThoughtCutsceneEndEvent;
+
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum ButtonType {
 	MergeThoughts

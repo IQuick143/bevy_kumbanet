@@ -15,6 +15,7 @@ impl Plugin for CabinPlugin {
 		.init_resource::<CursorCabinPosition>()
 		.init_resource::<ProgressBar>()
 		.add_event::<ButtonPressEvent>()
+		.add_event::<ThoughtCutsceneEndEvent>()
 		.add_startup_systems((
 			spawn_cabin_camera,
 			ui::spawn_ui,
@@ -27,9 +28,10 @@ impl Plugin for CabinPlugin {
 			spawn_collected_thoughts,
 			move_cabin_thoughts,
 			ui::check_buttons,
-			start_thought_animation,
 		).chain())
 		.add_systems((
+			start_thought_animation.before(crate::animation::AnimationSystemSet),
+			check_cutscene_end.after(crate::animation::AnimationSystemSet),
 			ui::update_progress_bar,
 			move_curtains,
 		))
@@ -184,9 +186,15 @@ fn move_curtains(
 fn start_thought_animation(
 	mut commands: Commands,
 	mut start_event: EventReader<ButtonPressEvent>,
+	other_director: Query<Entity, With<CabinCutsceneDirector>>,
 	thought_query: Query<Entity, (With<CabinThought>, Without<crate::animation::AnimatedObject>)>,
 ) {
 	use crate::animation::*;
+
+	// If a director is present, break
+	for _ in other_director.iter() {
+		return;
+	}
 
 	let mut start = false;
 	for event in start_event.iter() {
@@ -243,7 +251,8 @@ fn start_thought_animation(
 		commands.entity(actor_entity).remove::<(CabinThought, Velocity)>();
 	}
 
-	organize_play(&mut commands, choreo, actors);
+	let director = organize_play(&mut commands, choreo, actors);
+	commands.entity(director).insert(CabinCutsceneDirector);
 }
 
 fn update_cursor_position(
@@ -260,5 +269,17 @@ fn update_cursor_position(
 			(cursor.uv_position.x - 0.5) * CABIN_WIDTH,
 			(cursor.uv_position.y - 0.5) *  CABIN_HEIGHT,
 		);
+	}
+}
+
+fn check_cutscene_end(
+	mut in_event: EventReader<ChoreographyStopEvent>,
+	mut event: EventWriter<ThoughtCutsceneEndEvent>,
+	director: Query<Entity, With<CabinCutsceneDirector>>,
+) {
+	for e in in_event.iter() {
+		if let Ok(_) = director.get(e.director) {
+			event.send(ThoughtCutsceneEndEvent);
+		}
 	}
 }

@@ -11,11 +11,13 @@ impl Plugin for AnimationPlugin {
 	fn build(&self, app: &mut App) {
 		app
 		.add_event::<ChoreographyStopEvent>()
-		.add_systems((direct_play, animate_transforms, clean_up).chain())
+		.add_systems((direct_play, animate_transforms, clean_up).chain().in_set(AnimationSystemSet))
 		;
 	}
 }
 
+#[derive(SystemSet, Debug, Clone, Copy, Hash, PartialEq, Eq)]
+pub struct AnimationSystemSet;
 
 // A little cursed helper trait used to implement clone Box<dyn AnimationPath>
 pub trait AnimationPathClone {
@@ -120,7 +122,7 @@ pub fn organize_play(
 	commands: &mut Commands,
 	choreography: Choreography,
 	actors_entities: Vec<Entity>,
-) {
+) -> Entity {
 	if actors_entities.len() != choreography.n_actors {
 		warn!("Incorrect amount of actors got: {}, expected: {}", actors_entities.len(), choreography.n_actors);
 	}
@@ -137,7 +139,7 @@ pub fn organize_play(
 		time: 0.0,
 		actors: actors_entities,
 		choreography,
-	});
+	}).id()
 }
 
 // Updates animations based on directors choreographies
