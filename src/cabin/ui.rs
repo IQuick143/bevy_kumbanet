@@ -73,6 +73,40 @@ pub fn check_buttons(
 	}
 }
 
+pub fn spawn_curtains(
+	mut commands: Commands,
+	asset_server: Res<AssetServer>,
+) {
+	commands.spawn((SpriteBundle{
+		sprite: Sprite {custom_size: Some(Vec2::new(8.0, 9.0)), ..Default::default()},
+		texture: asset_server.load("ui/curtain.png"),
+		transform: Transform::from_translation(Vec3::new(-12.0, 0.0, 0.0))
+		.with_scale(Vec3::new(-1.0, 1.0, 1.0)),
+		..Default::default()
+	},
+	RenderLayers::layer(1),
+	Curtain	{
+		left: true,
+		dir: 1.0,
+	},
+	Name::new("Left Curtain"),
+	));
+
+	commands.spawn((SpriteBundle{
+		sprite: Sprite {custom_size: Some(Vec2::new(8.0, 9.0)), ..Default::default()},
+		texture: asset_server.load("ui/curtain.png"),
+		transform: Transform::from_translation(Vec3::new(12.0, 0.0, 0.0)),
+		..Default::default()
+	},
+	RenderLayers::layer(1),
+	Curtain {
+		left: false,
+		dir: -1.0,
+	},
+	Name::new("Right Curtain"),
+	));
+}
+
 pub fn spawn_bar(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,

@@ -19,6 +19,7 @@ impl Plugin for CabinPlugin {
 			spawn_cabin_camera,
 			ui::spawn_ui,
 			ui::spawn_bar,
+			ui::spawn_curtains,
 		))
 		.add_systems((
 			update_cursor_position,
@@ -30,6 +31,7 @@ impl Plugin for CabinPlugin {
 		).chain())
 		.add_systems((
 			ui::update_progress_bar,
+			move_curtains,
 		))
 		;
 	}
@@ -134,6 +136,46 @@ fn move_cabin_thoughts(
 			let r_square = r.length_squared();
 			if r_square > 0.01 {
 				velocity.0 += -(time.delta_seconds() * 3.0 / r_square) * r.normalize()
+			}
+		}
+	}
+}
+
+fn move_curtains(
+	mut start_event: EventReader<ButtonPressEvent>,
+	mut curtain_query: Query<(&mut Transform, &mut Curtain)>,
+	time: Res<Time>,
+) {
+	for event in start_event.iter() {
+		for (mut curtain_transform, curtain) in curtain_query.iter_mut() {
+			if event.button_type == ButtonType::MergeThoughts {
+				if curtain.left {
+					curtain_transform.translation.x = -11.9;
+				} else {
+					curtain_transform.translation.x = 11.9;
+				}
+			}
+		}
+	}
+
+	for (mut curtain_transform, mut curtain) in curtain_query.iter_mut() {
+		if curtain.left {
+			if curtain_transform.translation.x <= -12.0 {
+				curtain.dir = 1.0;
+			} else if curtain_transform.translation.x < -4.0 {
+				curtain_transform.translation.x += curtain.dir * 2.0 * time.delta_seconds();
+			} else {
+				curtain.dir = -1.0;
+				curtain_transform.translation.x += curtain.dir * 2.0 * time.delta_seconds();
+			}
+		} else {
+			if curtain_transform.translation.x >= 12.0 {
+				curtain.dir = -1.0;
+			} else if curtain_transform.translation.x > 4.0 {
+				curtain_transform.translation.x += curtain.dir * 2.0 * time.delta_seconds();
+			} else {
+				curtain.dir = 1.0;
+				curtain_transform.translation.x += curtain.dir * 2.0 * time.delta_seconds();
 			}
 		}
 	}
