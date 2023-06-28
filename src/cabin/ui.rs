@@ -80,7 +80,7 @@ pub fn spawn_curtains(
 	commands.spawn((SpriteBundle{
 		sprite: Sprite {custom_size: Some(Vec2::new(8.0, 9.0)), ..Default::default()},
 		texture: asset_server.load("ui/curtain.png"),
-		transform: Transform::from_translation(Vec3::new(-12.0, 0.0, 0.0))
+		transform: Transform::from_translation(Vec3::new(-12.0, 0.0, 100.0))
 		.with_scale(Vec3::new(-1.0, 1.0, 1.0)),
 		..Default::default()
 	},
@@ -95,7 +95,7 @@ pub fn spawn_curtains(
 	commands.spawn((SpriteBundle{
 		sprite: Sprite {custom_size: Some(Vec2::new(8.0, 9.0)), ..Default::default()},
 		texture: asset_server.load("ui/curtain.png"),
-		transform: Transform::from_translation(Vec3::new(12.0, 0.0, 0.0)),
+		transform: Transform::from_translation(Vec3::new(12.0, 0.0, 100.0)),
 		..Default::default()
 	},
 	RenderLayers::layer(1),
