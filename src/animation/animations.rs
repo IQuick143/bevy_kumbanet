@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use super::AnimationPath;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Stationary;
 impl AnimationPath for Stationary {
 	fn get_point(&self, _t: f32) -> bevy::prelude::Vec3 {
@@ -9,7 +9,7 @@ impl AnimationPath for Stationary {
 	}
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Sine {
 	pub direction: Vec3,
 	pub angular_frequency: f32,
