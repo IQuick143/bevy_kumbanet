@@ -10,6 +10,7 @@ mod post_processing;
 mod components;
 mod test_scene;
 mod resources;
+mod animation;
 mod thoughts;
 mod physics;
 mod player;
