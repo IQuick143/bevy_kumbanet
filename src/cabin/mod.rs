@@ -59,8 +59,13 @@ fn spawn_collected_thoughts(
 	mut commands: Commands,
 	assets: Res<AssetServer>,
 	mut collected_thoughts: EventReader<ThoughtCollectedEvent>,
+	mut progress_bar: ResMut<ProgressBar>,
 ) {
 	for ThoughtCollectedEvent {player: _, thought} in collected_thoughts.iter() {
+		match thought.emotion {
+			crate::thoughts::Emotion::Positive => progress_bar.good_progress += 0.1,
+			crate::thoughts::Emotion::Negative => progress_bar.bad_progress += 0.1,
+		}
 		spawn_cabin_thought(&mut commands, &assets, thought.clone());
 	}
 }
