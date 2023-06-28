@@ -43,11 +43,16 @@ where
 	fn get_point(&self, t: f32) -> Vec3;
 }
 
+// Makes objects move along AnimationPaths
 #[derive(Component, Debug)]
 pub struct AnimatedObject {
+	// Whether the animation is going
 	pub active: bool,
+	// Local time of the animation
 	pub time: f32,
+	// Coordinate origin for the object
 	pub offset: Vec3,
+	// The animation path object driving the animation
 	pub animation: Box<dyn AnimationPath>,
 }
 
@@ -60,18 +65,26 @@ impl AnimatedObject {
 
 #[derive(Component, Clone, Debug)]
 pub struct Choreography {
+	// How many actors are in the choreography
 	pub n_actors: usize,
+	// Default animation offset
 	pub initial_position: Vec3,
+	// The choreography events with their time stamp in seconds (doesn't need to be in order)
 	pub data: Vec<(f32, ChoreographyEvent)>
 }
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub enum ChoreographyEvent {
+	// Starts the animation on the actor given by the id
 	ActivateActor(usize),
+	// Stops the animation on the actor given by the id
 	DeactivateActor(usize),
+	// Sets a new animation on the actor given by the id
 	SetAnimation(usize, Box<dyn AnimationPath>),
+	// Sets the time on the actor( given by the id)'s watch
 	SetActorsTime(usize, f32),
+	// Sets the animation offset (0 in their coordinates) for the actor given by the id
 	SetActorsOffset(usize, Vec3),
 }
 
@@ -95,6 +108,8 @@ impl Director {
 	}
 }
 
+// Constructs a director with the given choreography and given actors
+// And gives the actors the necesary AnimatedObject components
 pub fn organize_play(
 	commands: &mut Commands,
 	choreography: Choreography,
@@ -118,6 +133,7 @@ pub fn organize_play(
 	});
 }
 
+// Updates animations based on directors choreographies
 fn direct_play(
 	mut actors: Query<&mut AnimatedObject>,
 	mut directors: Query<&mut Director>,
@@ -153,6 +169,7 @@ fn direct_play(
 	}
 }
 
+// Runs animations
 fn animate_transforms(
 	mut objects: Query<(&mut Transform, &mut AnimatedObject)>,
 	time: Res<Time>
