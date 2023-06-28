@@ -43,6 +43,7 @@ fn main() {
 		.add_plugins(default_plugins)
 		.init_resource::<resources::MainRenderTexture>()
 		.add_plugin(cabin::CabinPlugin {})
+		.add_plugin(animation::AnimationPlugin {})
 		.add_plugin(physics::PhysicsPlugin {})
 		.add_plugin(player::PlayerBehaviourPlugin {})
 		.add_plugin(thoughts::ThoughtsPlugin {})

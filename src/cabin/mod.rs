@@ -26,6 +26,7 @@ impl Plugin for CabinPlugin {
 			spawn_collected_thoughts,
 			move_cabin_thoughts,
 			ui::check_buttons,
+			start_thought_animation,
 		).chain())
 		.add_systems((
 			ui::update_progress_bar,
@@ -136,6 +137,70 @@ fn move_cabin_thoughts(
 			}
 		}
 	}
+}
+
+fn start_thought_animation(
+	mut commands: Commands,
+	mut start_event: EventReader<ButtonPressEvent>,
+	thought_query: Query<Entity, (With<CabinThought>, Without<crate::animation::AnimatedObject>)>,
+) {
+	use crate::animation::*;
+
+	let mut start = false;
+	for event in start_event.iter() {
+		if event.button_type == ButtonType::MergeThoughts {
+			start = true;
+		}
+	}
+	if !start {
+		return;
+	}
+
+	let choreo = Choreography {
+		// Three thoughts needed
+		n_actors: 3,
+		// Centered on center screen
+		initial_position: Vec3::new(0.0, 0.0, 0.0),
+		data: vec![
+			//Make the first actor stay in the center, second one orbit and third orbit differently
+			(0.0, ChoreographyEvent::SetAnimation(0, Box::new(animations::Stationary))),
+			(0.0, ChoreographyEvent::SetAnimation(1, Box::new(animations::Ellipse::circle(2.0, 0.5)))),
+			(0.0, ChoreographyEvent::SetAnimation(2, Box::new(animations::Ellipse::circle(3.0, 0.25)))),
+			// Start first actor
+			(0.0, ChoreographyEvent::ActivateActor(0)),
+			// Start second actor
+			(5.0, ChoreographyEvent::ActivateActor(1)),
+			// Start third actor
+			(10.0, ChoreographyEvent::ActivateActor(2)),
+			// Change the animation on the third actor to be smaller and faster
+			(15.0, ChoreographyEvent::SetAnimation(2, Box::new(animations::Ellipse::circle(1.0, 2.0)))),
+			// Change the animation on the second actor to be wilder
+			(20.0, ChoreographyEvent::SetAnimation(1, Box::new(animations::Sum {
+				a: Box::new(animations::Ellipse::circle(0.25, 4.0)),
+				b: Box::new(animations::Ellipse {major_semiaxis:Vec3::new(4.0,0.0,0.0), minor_semiaxis:Vec3::new(2.0,2.0,0.0), frequency:1.0})
+			}))),
+		]
+	};
+
+	// Look for actors
+	let mut actors = Vec::new();
+	for actor in thought_query.iter() {
+		if actors.len() >= choreo.n_actors {
+			break;
+		}
+		actors.push(actor);
+	}
+
+	if actors.len() < choreo.n_actors {
+		// Didnt find enough actors
+		return;
+	}
+	
+	for actor_entity in actors.clone() {
+		commands.entity(actor_entity).remove::<(CabinThought, Velocity)>();
+	}
+
+	organize_play(&mut commands, choreo, actors);
 }
 
 fn update_cursor_position(

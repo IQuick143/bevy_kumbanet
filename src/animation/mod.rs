@@ -62,7 +62,7 @@ impl AnimatedObject {
 pub struct Choreography {
 	pub n_actors: usize,
 	pub initial_position: Vec3,
-	data: Vec<(f32, ChoreographyEvent)>
+	pub data: Vec<(f32, ChoreographyEvent)>
 }
 
 #[allow(dead_code)]

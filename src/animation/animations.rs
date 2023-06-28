@@ -34,8 +34,8 @@ impl AnimationPath for Ellipse {
 
 #[derive(Clone, Debug)]
 pub struct Sum {
-	a: Box<dyn AnimationPath>,
-	b: Box<dyn AnimationPath>,
+	pub a: Box<dyn AnimationPath>,
+	pub b: Box<dyn AnimationPath>,
 }
 impl AnimationPath for Sum {
 	fn get_point(&self, t: f32) -> bevy::prelude::Vec3 {
