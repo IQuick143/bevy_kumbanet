@@ -1,6 +1,8 @@
 use std::fmt::Debug;
 use bevy::prelude::*;
 
+use crate::prelude::ChoreographyStopEvent;
+
 pub mod animations;
 
 pub struct AnimationPlugin;
@@ -8,7 +10,8 @@ pub struct AnimationPlugin;
 impl Plugin for AnimationPlugin {
 	fn build(&self, app: &mut App) {
 		app
-		.add_systems((direct_play, animate_transforms).chain())
+		.add_event::<ChoreographyStopEvent>()
+		.add_systems((direct_play, animate_transforms, clean_up).chain())
 		;
 	}
 }
@@ -86,10 +89,13 @@ pub enum ChoreographyEvent {
 	SetActorsTime(usize, f32),
 	// Sets the animation offset (0 in their coordinates) for the actor given by the id
 	SetActorsOffset(usize, Vec3),
+	// Ends the choreography, but if you stage events after the end, I don't guarantee what will happen
+	EndChoreography
 }
 
 #[derive(Component)]
 pub struct Director {
+	active: bool,
 	time: f32,
 	actors: Vec<Entity>,
 	choreography: Choreography
@@ -127,6 +133,7 @@ pub fn organize_play(
 		});
 	}
 	commands.spawn(Director {
+		active: true,
 		time: 0.0,
 		actors: actors_entities,
 		choreography,
@@ -136,21 +143,38 @@ pub fn organize_play(
 // Updates animations based on directors choreographies
 fn direct_play(
 	mut actors: Query<&mut AnimatedObject>,
-	mut directors: Query<&mut Director>,
+	mut directors: Query<(Entity, &mut Director)>,
+	mut stop_events: EventWriter<ChoreographyStopEvent>,
 	time: Res<Time>
 ) {
 	let dt = time.delta_seconds();
-	for mut director in directors.iter_mut() {
+	for (director_entity, mut director) in directors.iter_mut() {
+		if !director.active {
+			continue;
+		}
 		let t_0 = director.time;
 		let t_1 = t_0 + dt;
 		director.time = t_1;
 		for event in director.get_events_in_time_range(t_0, t_1) {
+			if let ChoreographyEvent::EndChoreography = event {
+				stop_events.send(ChoreographyStopEvent {director: director_entity});
+				director.active = false;
+				
+				for (actor_id, actor_name) in director.actors.iter().enumerate() {
+					match actors.get_mut(*actor_name) {
+						Err(error) => warn!("Could not reach actor {}. Reason: {}", actor_id, error),
+						Ok(mut actor) => actor.active = false
+					}
+				}
+				break;
+			}
 			let actor_id = match event {
 				ChoreographyEvent::ActivateActor(actor) => actor,
 				ChoreographyEvent::DeactivateActor(actor) => actor,
 				ChoreographyEvent::SetAnimation(actor, _) => actor,
 				ChoreographyEvent::SetActorsTime(actor, _) => actor,
 				ChoreographyEvent::SetActorsOffset(actor, _) => actor,
+				ChoreographyEvent::EndChoreography => unreachable!(),
 			};
 			let actor_name = director.actors[actor_id];
 			match actors.get_mut(actor_name) {
@@ -162,6 +186,7 @@ fn direct_play(
 						ChoreographyEvent::SetAnimation(_, animation) => actor.animation = animation,
 						ChoreographyEvent::SetActorsTime(_, time) => actor.time = time,
 						ChoreographyEvent::SetActorsOffset(_, offset) => actor.offset = offset,
+						ChoreographyEvent::EndChoreography => unreachable!(),
 					};
 				},
 			}
@@ -178,6 +203,22 @@ fn animate_transforms(
 		if animation.active {
 			transform.translation = animation.get_current_point();
 			animation.time += time.delta_seconds();
+		}
+	}
+}
+
+fn clean_up(
+	mut commands: Commands,
+	mut stop_events: EventReader<ChoreographyStopEvent>,
+//	actors: Query<Entity, With<AnimatedObject>>,
+	directors: Query<&Director>,
+) {
+	for event in stop_events.iter() {
+		if let Ok(director) = directors.get(event.director) {
+			for entity in director.actors.iter() {
+				commands.get_entity(*entity).map(|e| e.despawn_recursive());
+			}
+			commands.entity(event.director).despawn();
 		}
 	}
 }

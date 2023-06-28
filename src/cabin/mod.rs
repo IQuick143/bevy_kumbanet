@@ -221,6 +221,7 @@ fn start_thought_animation(
 				a: Box::new(animations::Ellipse::circle(0.25, 4.0)),
 				b: Box::new(animations::Ellipse {major_semiaxis:Vec3::new(4.0,0.0,0.0), minor_semiaxis:Vec3::new(2.0,2.0,0.0), frequency:1.0})
 			}))),
+			(30.0, ChoreographyEvent::EndChoreography)
 		]
 	};
 
