@@ -15,6 +15,7 @@ impl Plugin for DebugPlugin {
 				clear_on_refresh,
 				give_random_thought,
 				debug_buttons,
+				adjust_progress,
 			))
 		;
 	}
@@ -55,5 +56,23 @@ pub fn debug_buttons(
 ) {
 	for e in click_events.iter() {
 		println!("Button {:?} pressed", e.button_type);
+	}
+}
+
+fn adjust_progress(
+	mut progress_bar: ResMut<ProgressBar>,
+	keyboard: Res<Input<KeyCode>>,
+) {
+	if keyboard.just_pressed(KeyCode::O) {
+		progress_bar.good_progress -= 0.1;
+	}
+	if keyboard.just_pressed(KeyCode::P) {
+		progress_bar.good_progress += 0.1;
+	}
+	if keyboard.just_pressed(KeyCode::K) {
+		progress_bar.bad_progress -= 0.1;
+	}
+	if keyboard.just_pressed(KeyCode::L) {
+		progress_bar.bad_progress += 0.1;
 	}
 }

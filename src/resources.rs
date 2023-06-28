@@ -6,6 +6,13 @@ pub struct CursorCabinPosition {
 	pub uv_position: Vec2,
 }
 
+// Progress values between 0 and 1
+#[derive(Resource, PartialEq, Debug, Clone, Default)]
+pub struct ProgressBar {
+	pub good_progress: f32,
+	pub bad_progress: f32,
+}
+
 #[derive(Resource, PartialEq, Debug, Clone, Copy)]
 pub struct ThoughtSpawnParameters {
 	pub far_radius: f32,

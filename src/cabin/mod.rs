@@ -13,10 +13,12 @@ impl Plugin for CabinPlugin {
 	fn build(&self, app: &mut App) {
 		app
 		.init_resource::<CursorCabinPosition>()
+		.init_resource::<ProgressBar>()
 		.add_event::<ButtonPressEvent>()
 		.add_startup_systems((
 			spawn_cabin_camera,
 			ui::spawn_ui,
+			ui::spawn_bar,
 		))
 		.add_systems((
 			update_cursor_position,
@@ -25,6 +27,9 @@ impl Plugin for CabinPlugin {
 			move_cabin_thoughts,
 			ui::check_buttons,
 		).chain())
+		.add_systems((
+			ui::update_progress_bar,
+		))
 		;
 	}
 }

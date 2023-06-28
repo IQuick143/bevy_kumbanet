@@ -26,6 +26,12 @@ pub struct AngularVelocityDrag(pub f32);
 pub struct Hand;
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
+pub struct GoodBar;
+
+#[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
+pub struct BadBar;
+
+#[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct CabinCamera;
 
 #[derive(Component, Eq, PartialEq, Debug, Clone)]

@@ -72,3 +72,57 @@ pub fn check_buttons(
 		}
 	}
 }
+
+pub fn spawn_bar(
+	mut commands: Commands,
+	asset_server: Res<AssetServer>,
+) {
+	commands.spawn((SpriteBundle{
+		sprite: Sprite {custom_size: Some(Vec2::new(8.0, 1.0)), ..Default::default()},
+		texture: asset_server.load("ui/bar_back.png"),
+		transform: Transform::from_translation(Vec3::new(7.5, 0.0, 0.0))
+			.with_rotation(Quat::from_rotation_z(3.14/2.0)),
+		..Default::default()
+	},
+	RenderLayers::layer(1),
+	Name::new("Bar"),
+	));
+
+	commands.spawn((SpriteBundle{
+		sprite: Sprite {custom_size: Some(Vec2::new(4.5, 1.0)), ..Default::default()},
+		texture: asset_server.load("ui/good_bar.png"),
+		transform: Transform::from_translation(Vec3::new(7.5, 2.25, 1.0))
+			.with_rotation(Quat::from_rotation_z(-3.14/2.0))
+			.with_scale(Vec3::new(0.0, 1.0, 1.0)),
+		..Default::default()
+	},
+	RenderLayers::layer(1),
+	GoodBar,
+	Name::new("Good Bar"),
+	));
+
+	commands.spawn((SpriteBundle{
+		sprite: Sprite {custom_size: Some(Vec2::new(4.5, 1.0)), ..Default::default()},
+		texture: asset_server.load("ui/bad_bar.png"),
+		transform: Transform::from_translation(Vec3::new(7.5, -2.25, 1.0))
+			.with_rotation(Quat::from_rotation_z(-3.14/2.0))
+			.with_scale(Vec3::new(0.0, 1.0, 1.0)),
+		..Default::default()
+	},
+	RenderLayers::layer(1),
+	BadBar,
+	Name::new("Bad Bar"),
+	));
+}
+
+pub fn update_progress_bar(
+	progress_bar: Res<ProgressBar>,
+	mut good_query: Query<&mut Transform, With<GoodBar>>,
+	mut bad_query: Query<&mut Transform, (With<BadBar>, Without<GoodBar>)>,
+) {
+	let mut good_transform = good_query.single_mut();
+	let mut bad_transform = bad_query.single_mut();
+	
+	good_transform.scale.x = progress_bar.good_progress;
+	bad_transform.scale.x = progress_bar.bad_progress;
+}
