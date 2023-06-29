@@ -1,5 +1,11 @@
 use bevy::{prelude::*, render::{render_resource::{TextureDescriptor, TextureDimension, TextureFormat, TextureUsages, Extent3d}, texture::BevyDefault}};
 
+#[derive(Resource, Debug, Clone, Default)]
+pub struct ScoreCounter{
+	pub score: u32,
+	pub timer: Timer,
+}
+
 #[derive(Resource, PartialEq, Debug, Clone, Default)]
 pub struct CursorCabinPosition {
 	pub world_position: Vec2,

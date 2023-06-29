@@ -100,6 +100,83 @@ pub fn spawn_curtains(
 	)
 }
 
+pub fn spawn_score_counter(
+	mut commands: Commands,
+	asset_server: Res<AssetServer>,
+) {
+	let score = 0;
+	let font = asset_server.load("fonts/FiraSans-Bold.ttf");
+	let text_style = TextStyle {
+		font: font.clone(),
+		font_size: 80.0,
+		color: Color::rgba(0.9, 0.9, 0.1, 1.0),
+	};
+	let text_style_outline = TextStyle {
+		font: font.clone(),
+		font_size: 100.0,
+		color: Color::rgba(0.1, 0.1, 0.1, 1.0),
+	};	
+	commands
+		.spawn((Text2dBundle {
+			text: Text::from_section(format!("{}", score), text_style)
+				.with_alignment(TextAlignment::Center),
+			transform: Transform::from_translation(Vec3::new(0.0, 3.8, 10.0))
+				.with_scale(Vec3::splat(0.01)),
+			..Default::default()
+		},
+		ScoreText(false),
+		RenderLayers::layer(1),
+	));
+	commands
+		.spawn((Text2dBundle {
+			text: Text::from_section(format!("{}", score), text_style_outline)
+				.with_alignment(TextAlignment::Center),
+			transform: Transform::from_translation(Vec3::new(0.0, 3.8, 5.0))
+				.with_scale(Vec3::splat(0.02)),
+			..Default::default()
+		},
+		ScoreText(true),
+		RenderLayers::layer(1),
+	));
+	commands.insert_resource(ScoreCounter{
+		score: score,
+		timer: Timer::from_seconds(13.0, TimerMode::Repeating),
+	})
+}
+
+pub fn update_score_text(
+	mut score_counter: ResMut<ScoreCounter>,
+	mut score_query: Query<(&mut Transform, &mut Text, &ScoreText)>,
+	time: Res<Time>,
+) {
+	score_counter.timer.tick(time.delta());
+	score_counter.score += 1;
+
+	let score = score_counter.score;
+	for (mut transform, mut score_text, outline) in score_query.iter_mut() {
+		score_text.sections[0].value = format!("{}", score);
+		let sin = (score_counter.timer.percent() * 3.14).sin();
+		let cos = (score_counter.timer.percent() * 3.14).cos();
+		if !outline.0 {
+			transform.scale.x = 0.01 + sin * 0.005;
+			transform.scale.y = 0.01 + cos * 0.005;
+			score_text.sections[0].style.color = Color::rgba(
+				score_text.sections[0].style.color.r() + sin,
+				0.7,
+				0.2 + score_counter.timer.percent() / 2.0,
+				sin.abs());
+		} else {
+			transform.scale.x = 0.02 + cos * 0.01;
+			transform.scale.y = 0.02 + sin * 0.005;
+			score_text.sections[0].style.color = Color::rgba(
+				score_text.sections[0].style.color.r() + cos,
+				0.1,
+				0.1,
+				cos.abs());
+		}
+	}
+}
+
 pub fn spawn_bar(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,

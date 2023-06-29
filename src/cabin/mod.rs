@@ -20,6 +20,7 @@ impl Plugin for CabinPlugin {
 			spawn_cabin_camera,
 			ui::spawn_ui,
 			ui::spawn_bar,
+			ui::spawn_score_counter,
 		))
 		.add_systems((
 			update_cursor_position,
@@ -32,6 +33,7 @@ impl Plugin for CabinPlugin {
 			start_thought_animation.before(crate::animation::AnimationSystemSet),
 			check_cutscene_end.after(crate::animation::AnimationSystemSet),
 			ui::update_progress_bar,
+			ui::update_score_text,
 		))
 		;
 	}

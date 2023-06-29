@@ -48,3 +48,6 @@ pub struct CabinButton {
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct ClearCamera(pub bool);
+
+#[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
+pub struct ScoreText(pub bool);
