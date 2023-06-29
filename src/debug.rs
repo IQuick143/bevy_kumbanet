@@ -15,6 +15,7 @@ impl Plugin for DebugPlugin {
 				clear_on_refresh,
 				give_random_thought,
 				debug_buttons,
+				debug_choreography_stops,
 				adjust_progress,
 			))
 		;
@@ -56,6 +57,14 @@ pub fn debug_buttons(
 ) {
 	for e in click_events.iter() {
 		println!("Button {:?} pressed", e.button_type);
+	}
+}
+
+pub fn debug_choreography_stops(
+	mut events: EventReader<ChoreographyStopEvent>
+) {
+	for e in events.iter() {
+		println!("Choreography stopped, director_id:{:?}", e.director);
 	}
 }
 

@@ -31,11 +31,8 @@ pub struct GoodBar;
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct BadBar;
 
-#[derive(Component, Default, PartialEq, Debug, Clone, Copy)]
-pub struct Curtain{
-	pub left: bool,
-	pub dir: f32,
-}
+#[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
+pub struct CabinCutsceneDirector;
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct CabinCamera;

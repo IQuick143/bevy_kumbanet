@@ -12,10 +12,16 @@ pub struct PlayerInteractionEvent {
 	pub other: Entity
 }
 
+pub struct ChoreographyStopEvent {
+	pub director: Entity,
+}
+
 pub struct ButtonPressEvent {
 	pub button: Entity,
 	pub button_type: ButtonType
 }
+
+pub struct ThoughtCutsceneEndEvent;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum ButtonType {

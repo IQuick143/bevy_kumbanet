@@ -15,11 +15,11 @@ impl Plugin for CabinPlugin {
 		.init_resource::<CursorCabinPosition>()
 		.init_resource::<ProgressBar>()
 		.add_event::<ButtonPressEvent>()
+		.add_event::<ThoughtCutsceneEndEvent>()
 		.add_startup_systems((
 			spawn_cabin_camera,
 			ui::spawn_ui,
 			ui::spawn_bar,
-			ui::spawn_curtains,
 		))
 		.add_systems((
 			update_cursor_position,
@@ -27,11 +27,11 @@ impl Plugin for CabinPlugin {
 			spawn_collected_thoughts,
 			move_cabin_thoughts,
 			ui::check_buttons,
-			start_thought_animation,
 		).chain())
 		.add_systems((
+			start_thought_animation.before(crate::animation::AnimationSystemSet),
+			check_cutscene_end.after(crate::animation::AnimationSystemSet),
 			ui::update_progress_bar,
-			move_curtains,
 		))
 		;
 	}
@@ -141,52 +141,19 @@ fn move_cabin_thoughts(
 	}
 }
 
-fn move_curtains(
-	mut start_event: EventReader<ButtonPressEvent>,
-	mut curtain_query: Query<(&mut Transform, &mut Curtain)>,
-	time: Res<Time>,
-) {
-	for event in start_event.iter() {
-		for (mut curtain_transform, curtain) in curtain_query.iter_mut() {
-			if event.button_type == ButtonType::MergeThoughts {
-				if curtain.left {
-					curtain_transform.translation.x = -11.9;
-				} else {
-					curtain_transform.translation.x = 11.9;
-				}
-			}
-		}
-	}
-
-	for (mut curtain_transform, mut curtain) in curtain_query.iter_mut() {
-		if curtain.left {
-			if curtain_transform.translation.x <= -12.0 {
-				curtain.dir = 1.0;
-			} else if curtain_transform.translation.x < -4.0 {
-				curtain_transform.translation.x += curtain.dir * 2.0 * time.delta_seconds();
-			} else {
-				curtain.dir = -1.0;
-				curtain_transform.translation.x += curtain.dir * 2.0 * time.delta_seconds();
-			}
-		} else {
-			if curtain_transform.translation.x >= 12.0 {
-				curtain.dir = -1.0;
-			} else if curtain_transform.translation.x > 4.0 {
-				curtain_transform.translation.x += curtain.dir * 2.0 * time.delta_seconds();
-			} else {
-				curtain.dir = 1.0;
-				curtain_transform.translation.x += curtain.dir * 2.0 * time.delta_seconds();
-			}
-		}
-	}
-}
-
 fn start_thought_animation(
 	mut commands: Commands,
+	asset_server: Res<AssetServer>,
 	mut start_event: EventReader<ButtonPressEvent>,
+	other_director: Query<Entity, With<CabinCutsceneDirector>>,
 	thought_query: Query<Entity, (With<CabinThought>, Without<crate::animation::AnimatedObject>)>,
 ) {
 	use crate::animation::*;
+
+	// If a director is present, break
+	for _ in other_director.iter() {
+		return;
+	}
 
 	let mut start = false;
 	for event in start_event.iter() {
@@ -200,49 +167,66 @@ fn start_thought_animation(
 
 	let choreo = Choreography {
 		// Three thoughts needed
-		n_actors: 3,
+		n_actors: 5, // NOTE: 0th and 1st are the left/right curtains
 		// Centered on center screen
 		initial_position: Vec3::new(0.0, 0.0, 0.0),
-		data: vec![
+		data: vec![// NOTE: 0th and 1st are the curtains
 			//Make the first actor stay in the center, second one orbit and third orbit differently
-			(0.0, ChoreographyEvent::SetAnimation(0, Box::new(animations::Stationary))),
-			(0.0, ChoreographyEvent::SetAnimation(1, Box::new(animations::Ellipse::circle(2.0, 0.5)))),
-			(0.0, ChoreographyEvent::SetAnimation(2, Box::new(animations::Ellipse::circle(3.0, 0.25)))),
-			// Start first actor
+			(0.0, ChoreographyEvent::SetAnimation(2, Box::new(animations::Stationary))),
+			(0.0, ChoreographyEvent::SetAnimation(3, Box::new(animations::Ellipse::circle(2.0, 0.5)))),
+			(0.0, ChoreographyEvent::SetAnimation(4, Box::new(animations::Ellipse::circle(3.0, 0.25)))),
+			// Curtains
+			(0.0, ChoreographyEvent::SetActorsOffset(0, Vec3::new(-CABIN_WIDTH / 4.0,0.0,0.0))),
+			(0.0, ChoreographyEvent::SetActorsOffset(1, Vec3::new( CABIN_WIDTH / 4.0,0.0,0.0))),
+			(0.0, ChoreographyEvent::SetAnimation(0, Box::new(animations::Curtain {half_time: 2.5, movement: -Vec3::X * CABIN_WIDTH * 0.5}))),
+			(0.0, ChoreographyEvent::SetAnimation(1, Box::new(animations::Curtain {half_time: 2.5, movement:  Vec3::X * CABIN_WIDTH * 0.5}))),
+			// Start first thought
 			(0.0, ChoreographyEvent::ActivateActor(0)),
-			// Start second actor
-			(5.0, ChoreographyEvent::ActivateActor(1)),
-			// Start third actor
-			(10.0, ChoreographyEvent::ActivateActor(2)),
-			// Change the animation on the third actor to be smaller and faster
-			(15.0, ChoreographyEvent::SetAnimation(2, Box::new(animations::Ellipse::circle(1.0, 2.0)))),
-			// Change the animation on the second actor to be wilder
-			(20.0, ChoreographyEvent::SetAnimation(1, Box::new(animations::Sum {
+			(0.0, ChoreographyEvent::ActivateActor(1)),
+			(0.0, ChoreographyEvent::ActivateActor(2)),
+			// Start second thought
+			(5.0, ChoreographyEvent::ActivateActor(3)),
+			// Start third thought
+			(10.0, ChoreographyEvent::ActivateActor(4)),
+			// Change the animation on the third thought to be smaller and faster
+			(15.0, ChoreographyEvent::SetAnimation(4, Box::new(animations::Ellipse::circle(1.0, 2.0)))),
+			// Change the animation on the second thought to be wilder
+			(20.0, ChoreographyEvent::SetAnimation(3, Box::new(animations::Sum {
 				a: Box::new(animations::Ellipse::circle(0.25, 4.0)),
 				b: Box::new(animations::Ellipse {major_semiaxis:Vec3::new(4.0,0.0,0.0), minor_semiaxis:Vec3::new(2.0,2.0,0.0), frequency:1.0})
 			}))),
+			// Restart the curtains
+			(27.5, ChoreographyEvent::SetActorsTime(0,0.0)),
+			(27.5, ChoreographyEvent::SetActorsTime(1,0.0)),
+			(30.0, ChoreographyEvent::EndChoreography)
 		]
 	};
 
 	// Look for actors
 	let mut actors = Vec::new();
 	for actor in thought_query.iter() {
-		if actors.len() >= choreo.n_actors {
+		if actors.len() >= choreo.n_actors - 2 {
 			break;
 		}
 		actors.push(actor);
 	}
 
-	if actors.len() < choreo.n_actors {
+	if actors.len() < choreo.n_actors - 2 {
 		// Didnt find enough actors
 		return;
 	}
 	
+	let (left_curtain, right_curtain) = ui::spawn_curtains(&mut commands, asset_server);
+
+	actors.insert(0, left_curtain);
+	actors.insert(1, right_curtain);
+
 	for actor_entity in actors.clone() {
 		commands.entity(actor_entity).remove::<(CabinThought, Velocity)>();
 	}
 
-	organize_play(&mut commands, choreo, actors);
+	let director = organize_play(&mut commands, choreo, actors);
+	commands.entity(director).insert(CabinCutsceneDirector);
 }
 
 fn update_cursor_position(
@@ -259,5 +243,17 @@ fn update_cursor_position(
 			(cursor.uv_position.x - 0.5) * CABIN_WIDTH,
 			(cursor.uv_position.y - 0.5) *  CABIN_HEIGHT,
 		);
+	}
+}
+
+fn check_cutscene_end(
+	mut in_event: EventReader<ChoreographyStopEvent>,
+	mut event: EventWriter<ThoughtCutsceneEndEvent>,
+	director: Query<Entity, With<CabinCutsceneDirector>>,
+) {
+	for e in in_event.iter() {
+		if let Ok(_) = director.get(e.director) {
+			event.send(ThoughtCutsceneEndEvent);
+		}
 	}
 }

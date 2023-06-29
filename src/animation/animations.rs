@@ -42,3 +42,23 @@ impl AnimationPath for Sum {
 		self.a.get_point(t) + self.b.get_point(t)
 	}
 }
+
+#[derive(Clone, Copy, Debug)]
+pub struct Curtain {
+	// How much the curtain should move from being open to being closed
+	pub movement: Vec3,
+	// time till closing or opening
+	pub half_time: f32,
+}
+impl AnimationPath for Curtain {
+	fn get_point(&self, t: f32) -> bevy::prelude::Vec3 {
+		if t <= 0.0 {
+			return self.movement;
+		} else if t >= 2.0 * self.half_time {
+			return self.movement;
+		} else {
+			let x = t / self.half_time - 1.0;
+			return self.movement * x * x;
+		}
+	}
+}

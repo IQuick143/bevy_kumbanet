@@ -13,6 +13,7 @@ impl Plugin for PlayerBehaviourPlugin {
 		app
 		.add_system(player_controller)
 		.add_system(player_transform.after(PhysicsSystemSet))
+		.add_system(player_boost.run_if(on_event::<ThoughtCutsceneEndEvent>()))
 		;
 	}
 }
@@ -140,5 +141,18 @@ pub fn player_controller(
 pub fn player_transform(mut harness: Query<&mut Transform, With<PlayerHarness>>) {
 	for mut transform in harness.iter_mut() {
 		transform.look_to(Vec3::NEG_Z, Vec3::Y);
+	}
+}
+
+fn player_boost(mut player: Query<(&Transform, &mut Velocity), With<Player>>, mut event: EventReader<ThoughtCutsceneEndEvent>) {
+	let mut run = false;
+	for _ in event.iter() {
+		run = true;
+	}
+	if !run {
+		return;
+	}
+	for (transform, mut velocity) in player.iter_mut() {
+		velocity.0 += 500.0 * transform.forward()
 	}
 }
