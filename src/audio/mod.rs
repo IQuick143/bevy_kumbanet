@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use crate::prelude::*;
 use bevy_kira_audio::prelude::*;
@@ -14,9 +16,11 @@ impl Plugin for AudioPlugin {
 		.add_event::<ThoughtCutsceneEndEvent>()
 		.add_startup_systems((
 			spawn_player_ship_audio,
+			spawn_music,
 		))
 		.add_systems((
 			update_player_audio,
+			update_music_volume,
 		))
 		;
 	}
@@ -24,6 +28,9 @@ impl Plugin for AudioPlugin {
 
 #[derive(Component)]
 struct ShipAudio(Handle<AudioInstance>);
+
+#[derive(Component)]
+struct MusicPlayer(Handle<AudioInstance>);
 
 fn spawn_player_ship_audio(mut commands: Commands, audio: Res<Audio>, asset_server: Res<AssetServer>) {
 	let handle = audio
@@ -34,10 +41,19 @@ fn spawn_player_ship_audio(mut commands: Commands, audio: Res<Audio>, asset_serv
 	commands.spawn(ShipAudio(handle));
 }
 
+
+fn spawn_music(mut commands: Commands, audio: Res<Audio>, asset_server: Res<AssetServer>) {
+	let handle = audio
+	.play(asset_server.load("audio/effects/hyper_space_sounds.mp3"))
+	.looped()
+	.handle();
+	commands.spawn(MusicPlayer(handle));
+}
+
 fn update_player_audio(
 	player: Query<&Velocity, With<Player>>,
 	ship_audio: Query<&ShipAudio>,
-    mut audio_instances: ResMut<Assets<AudioInstance>>,
+	mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
 	if let Ok(ShipAudio(audio_instance)) = ship_audio.get_single() {
 		if let Some(audio_instance) = audio_instances.get_mut(audio_instance) {
@@ -50,6 +66,28 @@ fn update_player_audio(
 				}
 			} else {0.0};
 			audio_instance.set_volume(volume as f64, AudioTween::default());
+		}
+	}
+}
+
+fn update_music_volume(
+	priority_entities: Query<&PrioritySpeaker>,
+	music: Query<&MusicPlayer>,
+	mut audio_instances: ResMut<Assets<AudioInstance>>,
+) {
+	let mut should_be_quiet = false;
+	for _ in priority_entities.iter() {
+		should_be_quiet = true;
+		break;
+	}
+	let volume = if should_be_quiet {
+		0.10
+	} else {
+		1.0
+	};
+	if let Ok(MusicPlayer(audio_instance)) = music.get_single() {
+		if let Some(audio_instance) = audio_instances.get_mut(audio_instance) {
+			audio_instance.set_volume(volume as f64, AudioTween::linear(Duration::from_millis(2500)));
 		}
 	}
 }

@@ -228,7 +228,7 @@ fn start_thought_animation(
 	}
 
 	let director = organize_play(&mut commands, choreo, actors);
-	commands.entity(director).insert(CabinCutsceneDirector);
+	commands.entity(director).insert(CabinCutsceneDirector).insert(PrioritySpeaker);
 }
 
 fn update_cursor_position(

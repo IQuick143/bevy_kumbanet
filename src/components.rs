@@ -46,6 +46,10 @@ pub struct CabinButton {
 	pub half_extent: Vec2,
 }
 
+// When there is an entity with priority speaker enabled, music will quieten
+#[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
+pub struct PrioritySpeaker;
+
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct ClearCamera(pub bool);
 
