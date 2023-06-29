@@ -14,6 +14,7 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
-bevy = "0.10.1"
+bevy = {version = "0.10.1", features=["jpeg"] }
 rand = "0.8.5"
 bevy_editor_pls = "0.4.0"
+bevy_obj = "0.10.1"

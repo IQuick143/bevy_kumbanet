@@ -21,10 +21,12 @@ pub fn spawn_player_and_cameras(
 	mut commands: Commands,
 	mut meshes: ResMut<Assets<Mesh>>,
 	render_target: Res<MainRenderTexture>,
+	asset_server: Res<AssetServer>,
 ) {
-	let capsule_handle = meshes.add(Mesh::from(shape::Capsule {
+	/*let capsule_handle = meshes.add(Mesh::from(shape::Capsule {
 		radius: 0.5, depth: 1.0, ..Default::default()
-	}));
+	}));*/
+	let ship_handle = asset_server.load("ships/ship.glb#Scene0");
 
 	let half_size = UVec2::new(render_target.width / 2, render_target.height / 2);
 
@@ -40,10 +42,15 @@ pub fn spawn_player_and_cameras(
 	.with_children(|player_holder| {
 		// Visible player object
 		player_holder
-		.spawn(PbrBundle {
+		/*.spawn(PbrBundle {
 			mesh: capsule_handle,
 			transform: Transform::default().looking_to(-Vec3::Y, Vec3::Z),
 			..default()
+		})*/
+		.spawn(SceneBundle {
+			scene: ship_handle,
+			transform: Transform::from_scale(Vec3::splat(0.5)),
+			..Default::default()
 		});
 		// 3rd person camera
 		player_holder
