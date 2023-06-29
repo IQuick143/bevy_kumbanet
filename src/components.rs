@@ -22,6 +22,9 @@ pub struct VelocityDrag(pub f32);
 #[derive(Component, Default, PartialEq, Deref, DerefMut, Debug, Clone, Copy)]
 pub struct AngularVelocityDrag(pub f32);
 
+#[derive(Component)]
+pub struct Win(pub Timer);
+
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct Hand;
 

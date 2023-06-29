@@ -34,6 +34,8 @@ impl Plugin for CabinPlugin {
 			check_cutscene_end.after(crate::animation::AnimationSystemSet),
 			ui::update_progress_bar,
 			ui::update_score_text,
+			ui::spawn_win_screen,
+			ui::despawn_win_screen.after(ui::spawn_win_screen),
 		).distributive_run_if(in_state(GameState::Game)))
 		;
 	}

@@ -156,3 +156,4 @@ fn player_boost(mut player: Query<(&Transform, &mut Velocity), With<Player>>, mu
 		velocity.0 += 500.0 * transform.forward()
 	}
 }
+

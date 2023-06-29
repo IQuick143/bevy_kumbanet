@@ -177,6 +177,40 @@ pub fn update_score_text(
 	}
 }
 
+pub fn spawn_win_screen(
+	mut commands: Commands,
+	mut score_counter: ResMut<ScoreCounter>,
+	asset_server: Res<AssetServer>,
+) {
+	if score_counter.score > 99999 {
+		commands.spawn((SpriteBundle{
+			sprite: Sprite {custom_size: Some(Vec2::new(16.0, 9.0)), ..Default::default()},
+			texture: asset_server.load("boot/win.png"),
+			transform: Transform::from_translation(Vec3::new(0.0, 0.0, 100.0)),
+			..Default::default()
+		},
+		Win(Timer::from_seconds(0.1, TimerMode::Once)),
+		RenderLayers::layer(1),
+		Name::new("Win"),
+		));
+		score_counter.score = 0;
+	}
+}
+
+pub fn despawn_win_screen(
+	mut commands: Commands,
+	mut win_query: Query<(Entity, &mut Win)>,
+	time: Res<Time>,
+) {
+	for (entity, mut win) in win_query.iter_mut() {
+		win.0.tick(time.delta());
+		if win.0.just_finished() {
+			commands
+				.entity(entity).despawn_recursive();
+		}
+	}
+}
+
 pub fn spawn_bar(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
