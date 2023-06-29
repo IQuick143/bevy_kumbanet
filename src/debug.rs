@@ -2,7 +2,7 @@ use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig};
 #[cfg(debug_assertions)]
 use bevy_editor_pls::EditorPlugin;
 
-use crate::{prelude::*, thoughts::data::ThoughtLibrary};
+use crate::{prelude::*, thoughts::data::ThoughtLibrary, GameState};
 pub struct DebugPlugin;
 
 impl Plugin for DebugPlugin {
@@ -17,7 +17,8 @@ impl Plugin for DebugPlugin {
 				debug_buttons,
 				debug_choreography_stops,
 				adjust_progress,
-			))
+			).distributive_run_if(in_state(GameState::Game)))
+			.add_system(set_game_state)
 		;
 	}
 }
@@ -83,5 +84,24 @@ fn adjust_progress(
 	}
 	if keyboard.just_pressed(KeyCode::L) {
 		progress_bar.bad_progress += 0.1;
+	}
+}
+
+pub fn set_game_state(
+	keyboard: Res<Input<KeyCode>>,
+	state: Res<State<GameState>>,
+	mut next_state: ResMut<NextState<GameState>>,
+) {
+	if keyboard.just_pressed(KeyCode::Z) {
+		if state.0 != GameState::Boot {
+			next_state.set(GameState::Boot);
+			println!("Game State Boot");
+		}
+	}
+	if keyboard.just_pressed(KeyCode::X) {
+		if state.0 != GameState::Game {
+			next_state.set(GameState::Game);
+			println!("Game State Game");
+		}
 	}
 }

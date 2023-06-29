@@ -1,6 +1,6 @@
 use bevy::{prelude::*, render::{view::RenderLayers, camera::{RenderTarget, ScalingMode}}, core_pipeline::clear_color::ClearColorConfig, math::Vec3Swizzles};
 
-use crate::prelude::*;
+use crate::{prelude::*, GameState};
 
 mod ui;
 
@@ -16,25 +16,25 @@ impl Plugin for CabinPlugin {
 		.init_resource::<ProgressBar>()
 		.add_event::<ButtonPressEvent>()
 		.add_event::<ThoughtCutsceneEndEvent>()
-		.add_startup_systems((
+		.add_systems((
 			spawn_cabin_camera,
 			ui::spawn_ui,
 			ui::spawn_bar,
 			ui::spawn_score_counter,
-		))
+		).in_schedule(OnEnter(GameState::Game)))
 		.add_systems((
 			update_cursor_position,
 			ui::track_cursor,
 			spawn_collected_thoughts,
 			move_cabin_thoughts,
 			ui::check_buttons,
-		).chain())
+		).chain().distributive_run_if(in_state(GameState::Game)))
 		.add_systems((
 			start_thought_animation.before(crate::animation::AnimationSystemSet),
 			check_cutscene_end.after(crate::animation::AnimationSystemSet),
 			ui::update_progress_bar,
 			ui::update_score_text,
-		))
+		).distributive_run_if(in_state(GameState::Game)))
 		;
 	}
 }

@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::GameState;
 use crate::post_processing::effects::{flip, dither, feedback};
 use crate::post_processing::setup::{EffectOutput, link_texture};
 use crate::post_processing::{spawn_effect, self, link_effect};
@@ -17,8 +18,8 @@ impl Plugin for VFXPlugin {
 		//.add_plugin(post_processing::EffectPlugin::<jpeg::Encode>::default())
 		//.add_plugin(post_processing::EffectPlugin::<jpeg::Decode>::default())
 		.add_plugin(post_processing::EffectPlugin::<feedback::Effect>::default())
-		.add_startup_system(vfx_setup)
-		.add_system(update_effects.in_set(VFXChangeSystemSet));
+		.add_system(vfx_setup.in_schedule(OnEnter(GameState::Game)))
+		.add_system(update_effects.in_set(VFXChangeSystemSet).run_if(in_state(GameState::Game)));
 	}
 }
 

@@ -1,7 +1,7 @@
 use std::f32::consts::PI;
 
 use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig, render::camera::{RenderTarget, Viewport}};
-use crate::{prelude::*, physics::PhysicsSystemSet};
+use crate::{prelude::*, physics::PhysicsSystemSet, GameState};
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct PlayerHarness;
@@ -11,9 +11,9 @@ pub struct PlayerBehaviourPlugin;
 impl Plugin for PlayerBehaviourPlugin {
 	fn build(&self, app: &mut App) {
 		app
-		.add_system(player_controller)
-		.add_system(player_transform.after(PhysicsSystemSet))
-		.add_system(player_boost.run_if(on_event::<ThoughtCutsceneEndEvent>()))
+		.add_system(player_controller.run_if(in_state(GameState::Game)))
+		.add_system(player_transform.after(PhysicsSystemSet).run_if(in_state(GameState::Game)))
+		.add_system(player_boost.run_if(on_event::<ThoughtCutsceneEndEvent>()).run_if(in_state(GameState::Game)))
 		;
 	}
 }

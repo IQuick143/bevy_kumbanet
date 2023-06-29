@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use bevy::prelude::*;
 
-use crate::prelude::ChoreographyStopEvent;
+use crate::{prelude::ChoreographyStopEvent, GameState};
 
 pub mod animations;
 
@@ -11,7 +11,7 @@ impl Plugin for AnimationPlugin {
 	fn build(&self, app: &mut App) {
 		app
 		.add_event::<ChoreographyStopEvent>()
-		.add_systems((direct_play, animate_transforms, clean_up).chain().in_set(AnimationSystemSet))
+		.add_systems((direct_play, animate_transforms, clean_up).chain().in_set(AnimationSystemSet).distributive_run_if(in_state(GameState::Game)))
 		;
 	}
 }

@@ -17,10 +17,18 @@ mod player;
 mod events;
 mod cabin;
 mod audio;
+mod boot;
 mod vfx;
 
 #[cfg(debug_assertions)]
 mod debug;
+
+#[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
+pub enum GameState {
+	#[default]
+	Boot,
+	Game,
+}
 
 fn main() {
 	let default_plugins = DefaultPlugins;
@@ -42,7 +50,9 @@ fn main() {
 
 	app
 		.add_plugins(default_plugins)
+		.add_state::<GameState>()
 		.init_resource::<resources::MainRenderTexture>()
+		.add_plugin(boot::BootPlugin {})
 		.add_plugin(cabin::CabinPlugin {})
 		.add_plugin(audio::AudioPlugin {})
 		.add_plugin(animation::AnimationPlugin {})

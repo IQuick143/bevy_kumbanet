@@ -3,7 +3,7 @@ use bevy::prelude::*;
 pub mod data;
 mod systems;
 
-use crate::{prelude::*, physics::PhysicsSystemSet};
+use crate::{prelude::*, physics::PhysicsSystemSet, GameState};
 
 use self::{systems::*, data::ThoughtLibrary};
 
@@ -25,7 +25,7 @@ impl Plugin for ThoughtsPlugin {
 			rotate_thoughts,
 			collect_thoughts,
 			despawn_thoughts,
-		).after(PhysicsSystemSet));
+		).after(PhysicsSystemSet).distributive_run_if(in_state(GameState::Game)));
 	}
 }
 

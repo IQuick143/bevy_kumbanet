@@ -3,15 +3,15 @@ use bevy::prelude::*;
 use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
 
 use crate::physics::PhysicsSystemSet;
-use crate::prelude::*;
+use crate::{prelude::*, GameState};
 
 pub struct SetupPlugin {}
 
 impl Plugin for SetupPlugin {
 	fn build(&self, app: &mut App) {
 		app
-		.add_startup_system(scene_setup)
-		.add_system(player_interaction.after(PhysicsSystemSet));
+		.add_system(scene_setup.in_schedule(OnEnter(GameState::Game)))
+		.add_system(player_interaction.after(PhysicsSystemSet).run_if(in_state(GameState::Game)));
 	}
 }
 

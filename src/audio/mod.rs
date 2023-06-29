@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use crate::prelude::*;
+use crate::{prelude::*, GameState};
 use bevy_kira_audio::prelude::*;
 
 pub struct AudioPlugin;
@@ -14,14 +14,14 @@ impl Plugin for AudioPlugin {
 		.init_resource::<ProgressBar>()
 		.add_event::<ButtonPressEvent>()
 		.add_event::<ThoughtCutsceneEndEvent>()
-		.add_startup_systems((
+		.add_systems((
 			spawn_player_ship_audio,
 			spawn_music,
-		))
+		).in_schedule(OnEnter(GameState::Game)))
 		.add_systems((
 			update_player_audio,
 			update_music_volume,
-		))
+		).distributive_run_if(in_state(GameState::Game)))
 		;
 	}
 }

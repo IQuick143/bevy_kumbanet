@@ -5,12 +5,14 @@ use std::marker::PhantomData;
 use std::hash::Hash;
 
 use bevy::{
-	prelude::{Handle, Image, SystemSet, Component, Entity, Plugin, IntoSystemConfig},
+	prelude::{Handle, Image, SystemSet, Component, Entity, Plugin, IntoSystemConfig, in_state},
 	sprite::{Material2d, Material2dPlugin},
 	render::render_resource::AsBindGroup
 };
 
 pub use setup::{VFXPlugin, spawn_effect, link_effect, update_effect};
+
+use crate::GameState;
 
 // System set for all the systems which edit an effect
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
@@ -24,7 +26,7 @@ where <T::MaterialType as AsBindGroup>::Data: PartialEq + Eq + Hash + Clone {
     fn build(&self, app: &mut bevy::prelude::App) {
 		app
 		.add_plugin(Material2dPlugin::<T::MaterialType>::default())
-		.add_system(update_effect::<T>.after(VFXChangeSystemSet));
+		.add_system(update_effect::<T>.after(VFXChangeSystemSet).run_if(in_state(GameState::Game)));
     }
 }
 

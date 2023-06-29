@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::prelude::*;
+use crate::{prelude::*, GameState};
 
 #[derive(SystemSet, Hash, Debug, Default, PartialEq, Eq, Clone, Copy)]
 pub struct PhysicsSystemSet;
@@ -14,7 +14,7 @@ impl Plugin for PhysicsPlugin {
 			velocity_integration, rotation_integration,
 			velocity_drag, angular_velocity_drag,
 			check_interaction_collisions
-		).chain().in_set(PhysicsSystemSet));
+		).chain().in_set(PhysicsSystemSet).distributive_run_if(in_state(GameState::Game)));
 	}
 }
 
