@@ -16,6 +16,7 @@ mod physics;
 mod player;
 mod events;
 mod cabin;
+mod audio;
 mod vfx;
 
 #[cfg(debug_assertions)]
@@ -43,6 +44,7 @@ fn main() {
 		.add_plugins(default_plugins)
 		.init_resource::<resources::MainRenderTexture>()
 		.add_plugin(cabin::CabinPlugin {})
+		.add_plugin(audio::AudioPlugin {})
 		.add_plugin(animation::AnimationPlugin {})
 		.add_plugin(physics::PhysicsPlugin {})
 		.add_plugin(player::PlayerBehaviourPlugin {})

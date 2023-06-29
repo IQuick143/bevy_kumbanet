@@ -14,7 +14,40 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
-bevy = {version = "0.10.1", features=["jpeg"] }
 rand = "0.8.5"
 bevy_editor_pls = "0.4.0"
 bevy_obj = "0.10.1"
+# bevy = "0.10.1"
+
+
+[dependencies.bevy]
+version = "0.10.1"
+default-features = false
+features = [
+	"animation",
+	"bevy_animation",
+	"bevy_asset",
+	"bevy_core_pipeline",
+	"bevy_render",
+	"bevy_pbr",
+	"bevy_sprite",
+	"bevy_text",
+	"bevy_ui",
+	"bevy_winit",
+	"bevy_gltf",
+	"filesystem_watcher",
+	"png",
+	"jpeg",
+	"x11",
+]
+
+[dependencies.bevy_kira_audio]
+version = "0.15.0"
+default-features = false
+features = [
+#	"wav",
+#	"flac",
+	"mp3",
+	"ogg",
+	"settings_loader",
+]
