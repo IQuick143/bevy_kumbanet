@@ -4,6 +4,10 @@ use bevy::prelude::*;
 use crate::{prelude::*, GameState};
 use bevy_kira_audio::prelude::*;
 
+use self::slang::SlangTriggerEvent;
+
+mod slang;
+
 pub struct AudioPlugin;
 
 impl Plugin for AudioPlugin {
@@ -13,6 +17,7 @@ impl Plugin for AudioPlugin {
 		.init_resource::<CursorCabinPosition>()
 		.init_resource::<ProgressBar>()
 		.add_event::<ButtonPressEvent>()
+		.add_event::<SlangTriggerEvent>()
 		.add_event::<ThoughtCutsceneEndEvent>()
 		.add_systems((
 			spawn_player_ship_audio,
@@ -21,6 +26,9 @@ impl Plugin for AudioPlugin {
 		.add_systems((
 			update_player_audio,
 			update_music_volume,
+			slang::clean_up_slang_audio,
+			slang::play_slang_audio,
+			slang::try_trigger_slang,
 		).distributive_run_if(in_state(GameState::Game)))
 		;
 	}
@@ -81,13 +89,13 @@ fn update_music_volume(
 		break;
 	}
 	let volume = if should_be_quiet {
-		0.10
+		0.05
 	} else {
 		1.0
 	};
 	if let Ok(MusicPlayer(audio_instance)) = music.get_single() {
 		if let Some(audio_instance) = audio_instances.get_mut(audio_instance) {
-			audio_instance.set_volume(volume as f64, AudioTween::linear(Duration::from_millis(2500)));
+			audio_instance.set_volume(volume as f64, AudioTween::linear(Duration::from_millis(750)));
 		}
 	}
 }
