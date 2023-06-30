@@ -1,0 +1,2 @@
+The assets in the folder assets/thoughts/images/clipart/ (where this license file should be placed) are all licensed under the Creative Commons Zero 1.0 Public Domain License
+Any changes made (for example: rasterization, resizing, cropping, colour correction, filling in colour) are also licensed under the Creative Commons Zero 1.0 Public Domain License
