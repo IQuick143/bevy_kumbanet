@@ -138,20 +138,12 @@ pub fn spawn_score_counter(
 		ScoreText(true),
 		RenderLayers::layer(1),
 	));
-	commands.insert_resource(ScoreCounter{
-		score: score,
-		timer: Timer::from_seconds(13.0, TimerMode::Repeating),
-	})
 }
 
 pub fn update_score_text(
-	mut score_counter: ResMut<ScoreCounter>,
+	score_counter: Res<ScoreCounter>,
 	mut score_query: Query<(&mut Transform, &mut Text, &ScoreText)>,
-	time: Res<Time>,
 ) {
-	score_counter.timer.tick(time.delta());
-	score_counter.score += 1;
-
 	let score = score_counter.score;
 	for (mut transform, mut score_text, outline) in score_query.iter_mut() {
 		score_text.sections[0].value = format!("{}", score);
@@ -177,6 +169,7 @@ pub fn update_score_text(
 	}
 }
 
+/*
 pub fn spawn_win_screen(
 	mut commands: Commands,
 	mut score_counter: ResMut<ScoreCounter>,
@@ -210,6 +203,7 @@ pub fn despawn_win_screen(
 		}
 	}
 }
+*/
 
 pub fn spawn_bar(
 	mut commands: Commands,

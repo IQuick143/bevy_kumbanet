@@ -15,6 +15,7 @@ mod thoughts;
 mod physics;
 mod player;
 mod events;
+mod score;
 mod cabin;
 mod audio;
 mod boot;
@@ -55,6 +56,7 @@ fn main() {
 		.add_plugin(boot::BootPlugin {})
 		.add_plugin(cabin::CabinPlugin {})
 		.add_plugin(audio::AudioPlugin {})
+		.add_plugin(score::ScorePlugin {})
 		.add_plugin(animation::AnimationPlugin {})
 		.add_plugin(physics::PhysicsPlugin {})
 		.add_plugin(player::PlayerBehaviourPlugin {})
