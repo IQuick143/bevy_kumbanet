@@ -1,4 +1,4 @@
-use bevy::{prelude::*, render::camera::ScalingMode};
+use bevy::{prelude::*, render::camera::ScalingMode, asset::LoadState};
 
 use crate::GameState;
 
@@ -71,24 +71,29 @@ fn initial_setup(
 
 fn advance_slides(
 	mut commands: Commands,
+	asset_server: Res<AssetServer>,
 	mouse: Res<Input<MouseButton>>,
 	keyboard: Res<Input<KeyCode>>,
-	disclaimer_query: Query<Entity, With<Disclaimer>>,
+	disclaimer_query: Query<(Entity, &Handle<Image>), With<Disclaimer>>,
 	lore_query: Query<Entity, (With<Lore>, Without<Disclaimer>)>,
+	time: Res<Time>,
 	mut next_game_state: ResMut<NextState<GameState>>,
 ) {
 	let mut flag = true;
 	if mouse.just_pressed(MouseButton::Left) || keyboard.just_pressed(KeyCode::Return) {
-		for disclaimer in disclaimer_query.iter() {
-			commands
-				.entity(disclaimer).despawn_recursive();
+		for (disclaimer, texture) in disclaimer_query.iter() {
+			// Check that the image actually loaded before progressing
+			if asset_server.get_load_state(texture) == LoadState::Loaded && time.elapsed_seconds() > 10.0 {
+				commands.entity(disclaimer).despawn_recursive();
+			}
 			flag = false;
 		}
 		if flag {
 			for lore in lore_query.iter() {
-				commands
-					.entity(lore).despawn_recursive();
-				next_game_state.set(GameState::Game);
+				if time.elapsed_seconds() > 11.0 {
+					commands.entity(lore).despawn_recursive();
+					next_game_state.set(GameState::Game);
+				}
 			}
 		}
 	}
