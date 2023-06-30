@@ -31,13 +31,17 @@ fn fragment(
 //	let uv = coords_to_viewport_uv(position.xy, view.viewport);
 
 	let alfa = 0.420;
-	let beta = 0.1;
+	let beta = 0.25;
 	let omega = 0.05;
 	let d_omega = 0.01;
 
 	let col_1 = textureSample(texture_1, our_sampler_1, vec2<f32>(uv.x, uv.y)).rgb;
 	let col_2 = textureSample(texture_2, our_sampler_2, vec2<f32>(uv.x, uv.y)).rgb;
-	let A = ((1.0+beta) * col_1 - beta * col_2.gbr).rb;
+	let dcol = (1.0+beta) * col_1 - beta * col_2.rgb;
+	// old algorithm
+	//let A = dcol.rb;
+	let A = vec2<f32>(1.0,0.0) * dcol.r + vec2<f32>(-0.5,0.5) * dcol.g + vec2<f32>(-0.5,0.5) * dcol.b;
+	//let A = vec2<f32>(0.0,0.0);
 	let duv = vec2<f32>(sin(omega * (1.0 + d_omega) * time.value) * A.x + 0.1 * A.y, cos(omega * time.value) * A.y + 0.1 * A.x);
 	let colour = ((1.0 - alfa) * col_1 + alfa * textureSample(texture_2, our_sampler_2, vec2<f32>(uv.x, uv.y) + duv).rgb);
 

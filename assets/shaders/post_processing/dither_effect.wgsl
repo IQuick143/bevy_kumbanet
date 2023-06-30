@@ -31,7 +31,7 @@ fn fragment(
 	let noise = vec3<f32>(gold_noise(position.xy, 1.1 + C.r), gold_noise(position.xy, 2.1 + C.g), gold_noise(position.xy, 3.1 + C.b)) - 0.5;
 //	let threshold = vec3<f32>(0.1);
 
-	let quant_step = 0.50;
+	let quant_step = 0.30;
 
 	let colour = textureSample(texture, our_sampler, vec2<f32>(uv.x, uv.y)) - vec4<f32>(quant_step * noise, 0.0);
 
