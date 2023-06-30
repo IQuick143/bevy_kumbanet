@@ -39,7 +39,7 @@ fn fragment(
 
 	let col_1 = textureSample(texture_1, our_sampler_1, vec2<f32>(uv.x, uv.y)).rgb;
 	let col_2 = textureSample(texture_2, our_sampler_2, vec2<f32>(uv.x, uv.y)).rgb;
-	let dcol = (1.0+beta) * col_1 - beta * col_2.rgb;
+	let dcol = (1.0+beta) * col_1 - beta * col_2;
 	// old algorithm
 	//let A = dcol.rb;
 	let A = vec2<f32>(1.0,0.0) * dcol.r + vec2<f32>(-0.5,0.5) * dcol.g + vec2<f32>(-0.5,0.5) * dcol.b;
