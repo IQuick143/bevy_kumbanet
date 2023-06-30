@@ -307,10 +307,23 @@ pub mod dither {
 pub mod feedback {
 	use super::effect_imports::*;
 
-	#[derive(Component, Default)]
+	#[derive(Component)]
 	pub struct Effect {
 		material_handle: Handle<Material>,
 		pub time: f32,
+		pub alpha: f32,
+		pub beta: f32,
+	}
+
+	impl Default for Effect {
+		fn default() -> Self {
+			Self {
+				material_handle: Default::default(),
+				time: 0.0,
+				alpha: 0.42,
+				beta: 0.25,
+			}
+		}
 	}
 	
 	impl PostProcessingEffect for Effect {
@@ -322,6 +335,8 @@ pub mod feedback {
 	
 		fn update_info(&self, material: &mut Self::MaterialType) {
 			material.data.time = self.time;
+			material.data.alpha = self.alpha;
+			material.data.beta = self.beta;
 		}
 	
 		fn get_handle(&self) -> Handle<Self::MaterialType> { self.material_handle.clone() }
@@ -330,8 +345,8 @@ pub mod feedback {
 	#[derive(ShaderType, Default, Clone, Copy)]
 	struct MaterialInner {
 		time: f32,
-		valueb: f32,
-		valuec: f32,
+		alpha: f32,
+		beta: f32,
 		valued: f32
 	}
 	
