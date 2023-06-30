@@ -155,7 +155,7 @@ fn start_thought_animation(
 	use crate::animation::*;
 
 	// If a director is present, break
-	for _ in other_director.iter() {
+	if !other_director.is_empty() {
 		return;
 	}
 

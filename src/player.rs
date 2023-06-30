@@ -20,7 +20,6 @@ impl Plugin for PlayerBehaviourPlugin {
 
 pub fn spawn_player_and_cameras(
 	mut commands: Commands,
-	mut meshes: ResMut<Assets<Mesh>>,
 	render_target: Res<MainRenderTexture>,
 	asset_server: Res<AssetServer>,
 ) {
@@ -145,13 +144,10 @@ pub fn player_transform(mut harness: Query<&mut Transform, With<PlayerHarness>>)
 }
 
 fn player_boost(mut player: Query<(&Transform, &mut Velocity), With<Player>>, mut event: EventReader<ThoughtCutsceneEndEvent>) {
-	let mut run = false;
-	for _ in event.iter() {
-		run = true;
-	}
-	if !run {
+	if event.is_empty() {
 		return;
 	}
+	event.clear();
 	for (transform, mut velocity) in player.iter_mut() {
 		velocity.0 += 500.0 * transform.forward()
 	}

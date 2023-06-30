@@ -83,11 +83,7 @@ fn update_music_volume(
 	music: Query<&MusicPlayer>,
 	mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
-	let mut should_be_quiet = false;
-	for _ in priority_entities.iter() {
-		should_be_quiet = true;
-		break;
-	}
+	let should_be_quiet = !priority_entities.is_empty();
 	let volume = if should_be_quiet {
 		0.05
 	} else {

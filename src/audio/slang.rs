@@ -63,7 +63,6 @@ pub(super) fn play_slang_audio(
 	.with_volume(2.0)
 	.handle();
 	commands.spawn(SlangAudio(handle)).insert(PrioritySpeaker);
-	println!("Beta");
 }
 
 pub(super) fn clean_up_slang_audio(

@@ -2,7 +2,6 @@ use bevy::prelude::*;
 
 use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
 
-use crate::physics::PhysicsSystemSet;
 use crate::{prelude::*, GameState};
 
 pub struct SetupPlugin {}
@@ -10,8 +9,7 @@ pub struct SetupPlugin {}
 impl Plugin for SetupPlugin {
 	fn build(&self, app: &mut App) {
 		app
-		.add_system(scene_setup.in_schedule(OnEnter(GameState::Game)))
-		.add_system(player_interaction.after(PhysicsSystemSet).run_if(in_state(GameState::Game)));
+		.add_system(scene_setup.in_schedule(OnEnter(GameState::Game)));
 	}
 }
 
@@ -100,12 +98,4 @@ fn generate_texture() -> Image {
 		&texture_data,
 		TextureFormat::Rgba8UnormSrgb,
 	)
-}
-
-fn player_interaction(
-	mut events: EventReader<PlayerInteractionEvent>
-) {
-	for _e in events.iter() {
-		println!("Player is hitting smth!!!");
-	}
 }

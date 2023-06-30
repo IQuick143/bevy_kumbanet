@@ -1,8 +1,6 @@
 use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig};
-#[cfg(debug_assertions)]
-use bevy_editor_pls::EditorPlugin;
 
-use crate::{prelude::*, thoughts::data::ThoughtLibrary, GameState};
+use crate::{prelude::*, thoughts::data::ThoughtLibrary, GameState, physics::PhysicsSystemSet};
 pub struct DebugPlugin;
 
 impl Plugin for DebugPlugin {
@@ -19,6 +17,7 @@ impl Plugin for DebugPlugin {
 				adjust_progress,
 			).distributive_run_if(in_state(GameState::Game)))
 			.add_system(set_game_state)
+			.add_system(player_interaction.after(PhysicsSystemSet).run_if(in_state(GameState::Game)))
 		;
 	}
 }
@@ -103,5 +102,13 @@ pub fn set_game_state(
 			next_state.set(GameState::Game);
 			println!("Game State Game");
 		}
+	}
+}
+
+fn player_interaction(
+	mut events: EventReader<PlayerInteractionEvent>
+) {
+	for _e in events.iter() {
+		println!("Player is hitting smth!!!");
 	}
 }

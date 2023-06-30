@@ -1,6 +1,6 @@
-use bevy::{prelude::*, render::camera::{RenderTarget, ScalingMode}};
+use bevy::{prelude::*, render::camera::ScalingMode};
 
-use crate::{GameState, prelude::MainRenderTexture};
+use crate::GameState;
 
 pub struct BootPlugin;
 
