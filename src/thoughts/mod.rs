@@ -66,9 +66,12 @@ impl Thought {
 	}
 
 	pub fn create_material(&self, assets: &AssetServer) -> StandardMaterial {
+		let texture = self.load_image(assets);
 		StandardMaterial {
-			base_color_texture: Some(self.load_image(assets)),
-			//alpha_mode: (),
+			base_color_texture: Some(texture.clone()),
+			emissive_texture: Some(texture),
+			emissive: Color::DARK_GRAY,
+			alpha_mode: AlphaMode::Blend,
 			// depth_bias: () TODO: Consider using this for cursed effects
 			..Default::default()
 		}

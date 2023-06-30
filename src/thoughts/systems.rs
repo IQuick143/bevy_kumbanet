@@ -59,16 +59,18 @@ fn spawn_thought(
 	thought: Thought,
 	location: Vec3,
 ) -> Entity {
+	let thought_size = 2.5;
+
 	commands.spawn((
 		Name::new(format!("Thought {:?}@[{:.1};{:.1};{:.1}]", thought.word, location.x, location.y, location.z)),
 		MaterialMeshBundle {
-			mesh: mesh.add(Mesh::from(shape::Cube::default())),
+			mesh: mesh.add(Mesh::from(shape::Cube::new(thought_size))),
 			material: materials.add(thought.create_material(&asset_server)),
 			transform: Transform::from_translation(location),
 			..default()
 		},
 		thought,
-		Interactable {radius: 1.0},
+		Interactable {radius: thought_size},
 	))
 	.id()
 }

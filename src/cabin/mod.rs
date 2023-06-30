@@ -84,7 +84,7 @@ fn spawn_cabin_thought(
 ) {
 	commands.spawn((
 		SpriteBundle {
-			sprite: Sprite {custom_size: Some(Vec2::new(1.0, 1.0)), ..Default::default()},
+			sprite: Sprite {custom_size: Some(Vec2::new(1.5, 1.5)), ..Default::default()},
 			texture: thought.load_image(assets),
 			transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
 			..Default::default()
