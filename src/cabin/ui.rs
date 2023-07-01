@@ -1,6 +1,6 @@
 use bevy::{prelude::*, render::view::RenderLayers, math::Vec3Swizzles};
 
-use crate::prelude::*;
+use crate::{prelude::*, score};
 
 use super::{CABIN_WIDTH, CABIN_HEIGHT};
 
@@ -147,9 +147,13 @@ pub fn update_score_text(
 	score_counter: Res<ScoreCounter>,
 	mut score_query: Query<(&mut Transform, &mut Text, &ScoreText)>,
 ) {
-	let score = score_counter.score;
+	let score = if score_counter.score < 1000000 {
+		format!("{:.5}%", score_counter.score as f32 / 10000.0)
+	} else {
+		format!("NO WINNING IN LIFE")
+	};
 	for (mut transform, mut score_text, outline) in score_query.iter_mut() {
-		score_text.sections[0].value = format!("{}", score);
+		score_text.sections[0].value = score.clone();
 		let sin = (score_counter.timer.percent() * 3.14).sin();
 		let cos = (score_counter.timer.percent() * 3.14).cos();
 		if !outline.0 {
