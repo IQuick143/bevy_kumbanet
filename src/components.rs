@@ -26,7 +26,7 @@ pub struct AngularVelocityDrag(pub f32);
 pub struct Win(pub Timer);
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
-pub struct Hand;
+pub struct Cursor;
 
 #[derive(Component, Default, Eq, PartialEq, Debug, Clone, Copy)]
 pub struct GoodBar;

@@ -30,6 +30,7 @@ impl ThoughtLibrary {
 			Thought::new("thoughts/images/openclipart/pain_319678.png",			NO_SOUND, 2, Negative, Noun("pain".into())),
 			Thought::new("thoughts/images/openclipart/brain_306149.png",		NO_SOUND, 1, Positive, Noun("brain".into())),
 			Thought::new("thoughts/images/openclipart/prismatic_mind_327002.png",NO_SOUND,3, Positive, Noun("ascended mind".into())),
+			Thought::new("thoughts/images/openclipart/screw_191883.png",		NO_SOUND, 1, Negative, Noun("screw".into())),
 		]}
 	}
 

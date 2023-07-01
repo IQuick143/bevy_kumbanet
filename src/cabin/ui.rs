@@ -8,6 +8,7 @@ pub fn spawn_ui(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
 ) {
+	// Hud
 	commands.spawn((
 		SpriteBundle {
 			sprite: Sprite {custom_size: Some(Vec2::new(CABIN_WIDTH, CABIN_HEIGHT)), ..Default::default()},
@@ -19,18 +20,20 @@ pub fn spawn_ui(
 		Name::new("HUD"),
 	));
 
+	// Cursor
 	commands.spawn((
 		SpriteBundle {
 			sprite: Sprite {custom_size: Some(Vec2::new(0.5, 0.5)), ..Default::default()},
-			texture: asset_server.load("thoughts/images/debug/2.png"),
+			texture: asset_server.load("thoughts/images/openclipart/screw_191883.png"),
 			transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
 			..Default::default()
 		},
 		RenderLayers::layer(1),
 		Name::new("Hand"),
-		Hand,
+		Cursor,
 	));
 
+	// Merge button
 	let button_size = Vec2::new(2.0, 2.0);
 	commands.spawn((
 		SpriteBundle {
@@ -49,7 +52,7 @@ pub fn spawn_ui(
 }
 
 pub fn track_cursor(
-	mut cursor_sprite: Query<&mut Transform, With<Hand>>,
+	mut cursor_sprite: Query<&mut Transform, With<Cursor>>,
 	cursor: Res<CursorCabinPosition>,
 ) {
 	for mut sprite in cursor_sprite.iter_mut() {
