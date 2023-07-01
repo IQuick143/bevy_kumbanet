@@ -72,7 +72,7 @@ fn initial_setup(
 fn advance_slides(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
-	mouse: Res<Input<MouseButton>>,
+//	mouse: Res<Input<MouseButton>>,
 	keyboard: Res<Input<KeyCode>>,
 	disclaimer_query: Query<(Entity, &Handle<Image>), With<Disclaimer>>,
 	lore_query: Query<Entity, (With<Lore>, Without<Disclaimer>)>,
@@ -80,7 +80,7 @@ fn advance_slides(
 	mut next_game_state: ResMut<NextState<GameState>>,
 ) {
 	let mut flag = true;
-	if mouse.just_pressed(MouseButton::Left) || keyboard.just_pressed(KeyCode::Return) {
+	if keyboard.just_pressed(KeyCode::C) {
 		for (disclaimer, texture) in disclaimer_query.iter() {
 			// Check that the image actually loaded before progressing
 			if asset_server.get_load_state(texture) == LoadState::Loaded && time.elapsed_seconds() > 10.0 {
