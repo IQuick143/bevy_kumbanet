@@ -11,8 +11,11 @@ pub struct PlayerBehaviourPlugin;
 impl Plugin for PlayerBehaviourPlugin {
 	fn build(&self, app: &mut App) {
 		app
-		.add_system(player_controller.run_if(in_state(GameState::Game)))
-		.add_system(player_transform.after(PhysicsSystemSet).run_if(in_state(GameState::Game)))
+		.add_systems((
+			player_controller.run_if(in_state(GameState::Game)),
+			player_transform.after(PhysicsSystemSet),
+			clear_on_refresh,
+		).distributive_run_if(in_state(GameState::Game)))
 		.add_system(player_boost.run_if(on_event::<ThoughtCutsceneEndEvent>()).run_if(in_state(GameState::Game)))
 		;
 	}
@@ -153,3 +156,15 @@ fn player_boost(mut player: Query<(&Transform, &mut Velocity), With<Player>>, mu
 	}
 }
 
+fn clear_on_refresh(
+	keyboard: Res<Input<KeyCode>>,
+	mut clear_camera_query: Query<&mut Camera3d, With<ClearCamera>>,
+) {
+	let mut camera = clear_camera_query.single_mut();
+	if keyboard.just_pressed(KeyCode::C) {
+		camera.clear_color = ClearColorConfig::default();
+	}
+	if keyboard.just_released(KeyCode::C) {
+		camera.clear_color = ClearColorConfig::None;
+	}
+}

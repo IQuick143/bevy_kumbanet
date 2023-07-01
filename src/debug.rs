@@ -1,4 +1,4 @@
-use bevy::{prelude::*, core_pipeline::clear_color::ClearColorConfig};
+use bevy::prelude::*;
 
 use crate::{prelude::*, thoughts::data::ThoughtLibrary, GameState, physics::PhysicsSystemSet};
 pub struct DebugPlugin;
@@ -10,7 +10,6 @@ impl Plugin for DebugPlugin {
 			.add_plugin(bevy::diagnostic::FrameTimeDiagnosticsPlugin)
 			.add_plugin(bevy::diagnostic::EntityCountDiagnosticsPlugin)
 			.add_systems((
-				clear_on_refresh,
 				give_random_thought,
 				debug_buttons,
 				debug_choreography_stops,
@@ -19,21 +18,6 @@ impl Plugin for DebugPlugin {
 			.add_system(set_game_state)
 			.add_system(player_interaction.after(PhysicsSystemSet).run_if(in_state(GameState::Game)))
 		;
-	}
-}
-
-fn clear_on_refresh(
-	keyboard: Res<Input<KeyCode>>,
-	mut clear_camera_query: Query<(&mut Camera3d, &mut ClearCamera)>,
-) {
-	if keyboard.just_pressed(KeyCode::C) {
-		let (mut camera, mut clear_toggle) = clear_camera_query.single_mut();
-		if !clear_toggle.0 {
-			camera.clear_color = default();
-		} else {
-			camera.clear_color = ClearColorConfig::None;
-		}
-		clear_toggle.0 = !clear_toggle.0;
 	}
 }
 
