@@ -15,21 +15,10 @@ impl Plugin for SetupPlugin {
 
 fn scene_setup(
 	mut commands: Commands,
-	asset_server: Res<AssetServer>,
 	mut meshes: ResMut<Assets<Mesh>>,
 	mut images: ResMut<Assets<Image>>,
 	mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-	let star_texture = asset_server.load("images/stars.png");
-
-	// this material renders the texture normally
-	let star_material = materials.add(StandardMaterial {
-		base_color_texture: Some(star_texture.clone()),
-		alpha_mode: AlphaMode::Blend,
-		unlit: true,
-		..default()
-	});
-
 	let material = materials.add(StandardMaterial {
 		base_color_texture: Some(images.add(generate_texture())),
 		..default()
@@ -56,18 +45,6 @@ fn scene_setup(
 			..default()
 		},
 		transform: Transform::from_xyz(10.0, 16.0, 8.0),
-		..default()
-	});
-
-	// ground plane
-	commands.spawn(PbrBundle {
-		mesh: meshes.add(
-			shape::Plane {
-				size: 50.,
-				..default()
-			}.into(),
-		),
-		material: star_material,
 		..default()
 	});
 }
