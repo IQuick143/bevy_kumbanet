@@ -38,7 +38,7 @@ pub fn spawn_ui(
 	commands.spawn((
 		SpriteBundle {
 			sprite: Sprite {custom_size: Some(button_size), ..Default::default()},
-			texture: asset_server.load("thoughts/images/debug/-1.png"),
+			texture: asset_server.load("thoughts/images/openclipart/button_190592.png"),
 			transform: Transform::from_translation(Vec3::new(-7.0, -3.5, 0.0)),
 			..Default::default()
 		},
