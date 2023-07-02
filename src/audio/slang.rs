@@ -34,7 +34,7 @@ pub(super) fn try_trigger_slang(
 	}
 
 	// Idk he can talk by himself too sometimes
-	if rng.gen_bool(0.005 * 0.016) {
+	if rng.gen_bool(0.0025 * 0.016) {
 		do_it = true;
 	}
 
