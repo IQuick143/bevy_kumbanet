@@ -104,19 +104,22 @@ fn update_music_volume(
 	}
 }
 
-const SONGS: [(&str, u32); 3] = [
+const SONGS: [(&str, u32); 4] = [
 	("audio/music/cereal/corpo_blorpo.mp3", 0),
 	("audio/music/cereal/top_10.mp3", 100000),
-	("audio/music/cereal/psych_thing.mp3", 250000),
+	("audio/music/cereal/psych_thing.mp3", 300000),
+	("audio/music/iquick143/HealthAndPaintingInspection_2.mp3", 700000),
 ];
 
-const JUKEBOX: [(&str, f32); 3] = [
+const JUKEBOX: [(&str, f32); 5] = [
 	("audio/music/cereal/corpo_blorpo.mp3", 0.1),
-	("audio/music/cereal/top_10.mp3", 0.2),
-	("audio/music/cereal/psych_thing.mp3", 0.3),
+	("audio/music/cereal/top_10.mp3", 0.3),
+	("audio/music/cereal/psych_thing.mp3", 0.5),
+	("audio/music/iquick143/HealthAndPaintingInspection_2.mp3", 0.2),
+	("audio/music/iquick143/TheThingsWeNeverGotAroundTo.mp3", 0.1),
 ];
 
-const ENDING_SONG: &str = "audio/music/cereal/corpo_blorpo.mp3";
+const ENDING_SONG: &str = "audio/music/iquick143/TheThingsWeNeverGotAroundTo.mp3";
 
 const POST_GAME_TRACKS: usize = 255;
 
