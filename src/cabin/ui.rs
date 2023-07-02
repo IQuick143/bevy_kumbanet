@@ -1,6 +1,6 @@
 use bevy::{prelude::*, render::view::RenderLayers, math::Vec3Swizzles};
 
-use crate::{prelude::*, score};
+use crate::prelude::*;
 
 use super::{CABIN_WIDTH, CABIN_HEIGHT};
 

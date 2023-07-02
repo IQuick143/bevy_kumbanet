@@ -15,10 +15,7 @@ opt-level = 3
 
 [dependencies]
 rand = "0.8.5"
-bevy_editor_pls = "0.4.0"
 bevy_obj = "0.10.1"
-# bevy = "0.10.1"
-
 
 [dependencies.bevy]
 version = "0.10.1"
@@ -29,6 +26,7 @@ features = [
 	"bevy_asset",
 	"bevy_core_pipeline",
 	"bevy_render",
+	"bevy_scene",
 	"bevy_pbr",
 	"bevy_sprite",
 	"bevy_text",
@@ -51,3 +49,6 @@ features = [
 	"ogg",
 	"settings_loader",
 ]
+
+[dev-dependencies]
+bevy_editor_pls = "0.4.0"
