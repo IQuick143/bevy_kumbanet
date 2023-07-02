@@ -153,6 +153,7 @@ fn start_thought_animation(
 	thought_query: Query<Entity, (With<CabinThought>, Without<crate::animation::AnimatedObject>)>,
 ) {
 	use crate::animation::*;
+	use rand::seq::SliceRandom;
 
 	// If a director is present, break
 	if !other_director.is_empty() {
@@ -169,7 +170,10 @@ fn start_thought_animation(
 		return;
 	}
 
-	let choreo = Choreography {
+	let mut rng = rand::thread_rng();
+
+	let choreo = [
+	Choreography {
 		// Three thoughts needed
 		n_actors: 5, // NOTE: 0th and 1st are the left/right curtains
 		// Centered on center screen
@@ -204,7 +208,55 @@ fn start_thought_animation(
 			(27.5, ChoreographyEvent::SetActorsTime(1,0.0)),
 			(30.0, ChoreographyEvent::EndChoreography)
 		]
-	};
+	},
+	Choreography {
+		// Three thoughts needed
+		n_actors: 5, // NOTE: 0th and 1st are the left/right curtains
+		// Centered on center screen
+		initial_position: Vec3::new(0.0, 0.0, 0.0),
+		data: vec![// NOTE: 0th and 1st are the curtains
+			//Make the first actor stay in the center, second one orbit and third orbit differently
+			(0.0, ChoreographyEvent::SetAnimation(2, Box::new(animations::Stationary))),
+			(0.0, ChoreographyEvent::SetAnimation(3, Box::new(animations::Ellipse {major_semiaxis: 1.5 * Vec3::Y, minor_semiaxis: Vec3::ZERO, frequency: 0.333}))),
+			(0.0, ChoreographyEvent::SetAnimation(4, Box::new(animations::Ellipse {major_semiaxis:-1.5 * Vec3::Y, minor_semiaxis: Vec3::ZERO, frequency: 0.333}))),
+			(0.0, ChoreographyEvent::SetActorsOffset(3, Vec3::new(-1.5,0.0,0.0))),
+			(0.0, ChoreographyEvent::SetActorsOffset(4, Vec3::new( 1.5,0.0,0.0))),
+			// Curtains
+			(0.0, ChoreographyEvent::SetActorsOffset(0, Vec3::new(-CABIN_WIDTH / 4.0,0.0,0.0))),
+			(0.0, ChoreographyEvent::SetActorsOffset(1, Vec3::new( CABIN_WIDTH / 4.0,0.0,0.0))),
+			(0.0, ChoreographyEvent::SetAnimation(0, Box::new(animations::Curtain {half_time: 2.5, movement: -Vec3::X * CABIN_WIDTH * 0.5}))),
+			(0.0, ChoreographyEvent::SetAnimation(1, Box::new(animations::Curtain {half_time: 2.5, movement:  Vec3::X * CABIN_WIDTH * 0.5}))),
+			// Start curtains
+			(0.0, ChoreographyEvent::ActivateActor(0)),
+			(0.0, ChoreographyEvent::ActivateActor(1)),
+			// Start two thoughts
+			(2.5, ChoreographyEvent::ActivateActor(3)),
+			(2.5, ChoreographyEvent::ActivateActor(4)),
+			// Start third thought
+			(10.0, ChoreographyEvent::ActivateActor(2)),
+			(15.0, ChoreographyEvent::SetActorsTime(2, 0.0)),
+			(15.0, ChoreographyEvent::SetAnimation(2, Box::new(animations::Sum {
+				a: Box::new(animations::Ellipse {major_semiaxis: Vec3::ZERO, minor_semiaxis: 2.5 * Vec3::X, frequency: 0.8}),
+				b: Box::new(animations::Ellipse {major_semiaxis: Vec3::ZERO, minor_semiaxis: 2.5 * Vec3::Y, frequency: 0.6}),
+			}))),
+			// Change the animation on the second thought to be wilder
+			(20.0, ChoreographyEvent::SetActorsOffset(3, Vec3::ZERO)),
+			(20.0, ChoreographyEvent::SetActorsOffset(4, Vec3::ZERO)),
+			(20.0, ChoreographyEvent::SetAnimation(3, Box::new(animations::Sum {
+				a: Box::new(animations::Ellipse::circle(3.0, 0.5)),
+				b: Box::new(animations::Ellipse {major_semiaxis:Vec3::new(0.0,1.0,0.0), minor_semiaxis:Vec3::ZERO, frequency:2.0})
+			}))),
+			(20.0, ChoreographyEvent::SetAnimation(4, Box::new(animations::Sum {
+				a: Box::new(animations::Ellipse::circle(3.0, 0.5)),
+				b: Box::new(animations::Ellipse {major_semiaxis:Vec3::new(0.0,-1.0,0.0), minor_semiaxis:Vec3::ZERO, frequency:2.0})
+			}))),
+			// Restart the curtains
+			(27.5, ChoreographyEvent::SetActorsTime(0,0.0)),
+			(27.5, ChoreographyEvent::SetActorsTime(1,0.0)),
+			(30.0, ChoreographyEvent::EndChoreography)
+		]
+	}
+	].choose(&mut rng).unwrap().clone();
 
 	// Look for actors
 	let mut actors = Vec::new();
@@ -230,7 +282,7 @@ fn start_thought_animation(
 	}
 
 	let director = organize_play(&mut commands, choreo, actors);
-	commands.entity(director).insert(CabinCutsceneDirector).insert(PrioritySpeaker);
+	commands.entity(director).insert(CabinCutsceneDirector);//.insert(PrioritySpeaker);
 }
 
 fn update_cursor_position(
