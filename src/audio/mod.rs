@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
+use rand::seq::SliceRandom;
 use crate::{prelude::*, GameState};
 use bevy_kira_audio::prelude::*;
 
@@ -26,6 +27,7 @@ impl Plugin for AudioPlugin {
 		.add_systems((
 			update_player_audio,
 			update_music_volume,
+			update_track,
 			slang::clean_up_slang_audio,
 			slang::play_slang_audio,
 			slang::try_trigger_slang,
@@ -38,7 +40,10 @@ impl Plugin for AudioPlugin {
 struct ShipAudio(Handle<AudioInstance>);
 
 #[derive(Component)]
-struct MusicPlayer(Handle<AudioInstance>);
+struct MusicPlayer {
+	track: usize,
+	handle: Handle<AudioInstance>
+}
 
 fn spawn_player_ship_audio(mut commands: Commands, audio: Res<Audio>, asset_server: Res<AssetServer>) {
 	let handle = audio
@@ -49,13 +54,12 @@ fn spawn_player_ship_audio(mut commands: Commands, audio: Res<Audio>, asset_serv
 	commands.spawn(ShipAudio(handle));
 }
 
-
 fn spawn_music(mut commands: Commands, audio: Res<Audio>, asset_server: Res<AssetServer>) {
 	let handle = audio
-	.play(asset_server.load("audio/effects/hyper_space_sounds.mp3"))
+	.play(asset_server.load(SONGS[0].0))
 	.looped()
 	.handle();
-	commands.spawn(MusicPlayer(handle));
+	commands.spawn(MusicPlayer {track: 0, handle});
 }
 
 fn update_player_audio(
@@ -89,9 +93,91 @@ fn update_music_volume(
 	} else {
 		1.0
 	};
-	if let Ok(MusicPlayer(audio_instance)) = music.get_single() {
-		if let Some(audio_instance) = audio_instances.get_mut(audio_instance) {
-			audio_instance.set_volume(volume as f64, AudioTween::linear(Duration::from_millis(750)));
+	if let Ok(MusicPlayer {track, handle}) = music.get_single() {
+		if let Some(audio_instance) = audio_instances.get_mut(handle) {
+			if *track == POST_GAME_TRACKS {
+				audio_instance.set_volume(1.0_f64, AudioTween::linear(Duration::from_millis(750)));
+			} else {
+				audio_instance.set_volume(volume as f64, AudioTween::linear(Duration::from_millis(750)));
+			}
+		}
+	}
+}
+
+const SONGS: [(&str, u32); 3] = [
+	("audio/music/cereal/corpo_blorpo.mp3", 0),
+	("audio/music/cereal/top_10.mp3", 100000),
+	("audio/music/cereal/psych_thing.mp3", 250000),
+];
+
+const JUKEBOX: [(&str, f32); 3] = [
+	("audio/music/cereal/corpo_blorpo.mp3", 0.1),
+	("audio/music/cereal/top_10.mp3", 0.2),
+	("audio/music/cereal/psych_thing.mp3", 0.3),
+];
+
+const ENDING_SONG: &str = "audio/music/cereal/corpo_blorpo.mp3";
+
+const POST_GAME_TRACKS: usize = 255;
+
+fn update_track(
+	score: Option<Res<ScoreCounter>>,
+	mut music: Query<&mut MusicPlayer>,
+	mut audio_instances: ResMut<Assets<AudioInstance>>,
+	audio: Res<Audio>,
+	asset_server: Res<AssetServer>
+) {
+	if let Some(score) = score {
+		let value = score.score;
+
+		// Post-game jukebox
+		if value > 1000000 {
+			for mut player in music.iter_mut() {
+				if player.track != POST_GAME_TRACKS {
+					if let Some(instance) = audio_instances.get_mut(&player.handle) {
+						instance.stop(AudioTween::linear(Duration::from_secs(3)));
+					}
+					let handle = audio
+					.play(asset_server.load(ENDING_SONG))
+					.fade_in(AudioTween::linear(Duration::from_secs(1)))
+					.handle();
+					player.handle = handle;
+					player.track = POST_GAME_TRACKS;
+					continue;
+				}
+				if let Some(instance) = audio_instances.get_mut(&player.handle) {
+					if instance.state() == PlaybackState::Stopped {
+						// Roll a new track
+						let mut rng = rand::thread_rng();
+						if let Ok(&(track,_)) = JUKEBOX.choose_weighted(&mut rng, |item| item.1) {
+							let handle = audio
+							.play(asset_server.load(track))
+							.fade_in(AudioTween::linear(Duration::from_secs(1)))
+							.handle();
+							player.handle = handle;
+						}
+					}
+				}
+			}
+			return;
+		}
+
+		// In-game progression based
+		for mut player in music.iter_mut() {
+			for (i, &(song_name, needed_score)) in SONGS.iter().enumerate().rev() {
+				if needed_score < value && player.track < i {
+					if let Some(instance) = audio_instances.get_mut(&player.handle) {
+						instance.stop(AudioTween::linear(Duration::from_secs(5)));
+					}
+					let handle = audio
+					.play(asset_server.load(song_name))
+					.fade_in(AudioTween::linear(Duration::from_secs(3)))
+					.looped()
+					.handle();
+					player.handle = handle;
+					player.track = i;
+				}
+			}
 		}
 	}
 }
