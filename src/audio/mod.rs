@@ -28,6 +28,7 @@ impl Plugin for AudioPlugin {
 			update_player_audio,
 			update_music_volume,
 			update_track,
+			play_button_sounds,
 			slang::clean_up_slang_audio,
 			slang::play_slang_audio,
 			slang::try_trigger_slang,
@@ -181,6 +182,18 @@ fn update_track(
 					player.track = i;
 				}
 			}
+		}
+	}
+}
+
+fn play_button_sounds(
+	audio: Res<Audio>,
+	asset_server: Res<AssetServer>,
+	mut button_events: EventReader<ButtonPressEvent>
+) {
+	for e in button_events.iter() {
+		if e.button_type == ButtonType::MergeThoughts {
+			audio.play(asset_server.load("audio/effects/button.ogg")).with_volume(0.5);
 		}
 	}
 }
