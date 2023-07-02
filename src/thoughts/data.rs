@@ -31,6 +31,18 @@ impl ThoughtLibrary {
 			Thought::new("thoughts/images/openclipart/brain_306149.png",		NO_SOUND, 1, Positive, Noun("brain".into())),
 			Thought::new("thoughts/images/openclipart/prismatic_mind_327002.png",NO_SOUND,3, Positive, Noun("ascended mind".into())),
 			Thought::new("thoughts/images/openclipart/screw_191883.png",		NO_SOUND, 1, Negative, Noun("screw".into())),
+			Thought::new("thoughts/images/wikimedia/abstract_deities.jpg",		NO_SOUND, 1, Positive, Noun("deity".into())),
+			Thought::new("thoughts/images/wikimedia/bose_einstein.jpg",			NO_SOUND, 1, Positive, Noun("technology".into())),
+			Thought::new("thoughts/images/wikimedia/cursed_stick_figures.jpg",	NO_SOUND, 2, Negative, Noun("Them".into())),
+			Thought::new("thoughts/images/flickr/aligator.jpg",					NO_SOUND, 2, Negative, Noun("aligator".into())),
+			Thought::new("thoughts/images/flickr/chair.jpg",					NO_SOUND, 1, Negative, Noun("chair".into())),
+			Thought::new("thoughts/images/flickr/clouds.jpg",					NO_SOUND, 1, Positive, Noun("clouds".into())),
+			Thought::new("thoughts/images/flickr/decay.jpg",					NO_SOUND, 2, Negative, Verb("decay".into())),
+			Thought::new("thoughts/images/flickr/despair.jpg",					NO_SOUND, 2, Negative, Verb("despair".into())),
+			Thought::new("thoughts/images/flickr/fog_man.jpg",					NO_SOUND, 1, Negative, Noun("Him".into())),
+			Thought::new("thoughts/images/flickr/lock.jpg",						NO_SOUND, 1, Positive, Noun("lock".into())),
+			Thought::new("thoughts/images/flickr/love.jpg",						NO_SOUND, 2, Positive, Verb("love".into())),
+			Thought::new("thoughts/images/flickr/nature.jpg",					NO_SOUND, 2, Positive, Noun("nature".into())),
 		]}
 	}
 
