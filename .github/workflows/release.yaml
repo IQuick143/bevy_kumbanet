@@ -13,8 +13,7 @@ on:
 
 env:
   # update with the name of the main binary
-  binary: bevy_github_ci_template
-  add_binaries_to_github_release: true
+  binary: kumbanet
 
 jobs:
 
