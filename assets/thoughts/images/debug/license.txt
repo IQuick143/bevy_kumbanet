@@ -1,0 +1,6 @@
+The files:
+-1.png
+-2.png
+1.png
+2.png
+Are original drawings licensed under licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/)

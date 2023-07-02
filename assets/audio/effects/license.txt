@@ -1,0 +1,4 @@
+The files:
+button.ogg
+hyper_space_sounds.mp3
+are original works licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/)

@@ -1,0 +1,8 @@
+The files:
+bad_bar.png
+bar_back.png
+curtain.png
+good_bar.png
+hand.png
+hud.png
+Are original drawings licensed under licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/)

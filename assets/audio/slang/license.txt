@@ -1,0 +1,2 @@
+The files in the folder assets/audio/slang/ (where this file should be located)
+Are recordings by Slangens, licensed under CC BY-NC-SA https://creativecommons.org/licenses/by-nc-sa/4.0/

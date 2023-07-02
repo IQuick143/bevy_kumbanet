@@ -1,0 +1,5 @@
+The files:
+disclaimer.png
+lore.png
+win.png
+Are original drawings licensed under licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/)
