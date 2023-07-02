@@ -148,9 +148,9 @@ pub fn update_score_text(
 	mut score_query: Query<(&mut Transform, &mut Text, &ScoreText)>,
 ) {
 	let score = if score_counter.score < 1000000 {
-		format!("{:.5}%", score_counter.score as f32 / 10000.0)
+		format!("{:.4}%", score_counter.score as f32 / 10000.0)
 	} else {
-		format!("NO WINNING IN LIFE")
+		format!("WELCOME HOME")
 	};
 	for (mut transform, mut score_text, outline) in score_query.iter_mut() {
 		score_text.sections[0].value = score.clone();
