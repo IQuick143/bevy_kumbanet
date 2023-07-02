@@ -3,7 +3,7 @@ use rand::{thread_rng, Rng};
 use crate::prelude::*;
 use bevy_kira_audio::prelude::*;
 
-pub(super) struct SlangTriggerEvent;
+pub(super) struct SlangTriggerEvent {pub philsophy: bool}
 
 #[derive(Component)]
 pub(super) struct SlangAudio(Handle<AudioInstance>);
@@ -19,6 +19,7 @@ pub(super) fn try_trigger_slang(
 	}
 
 	let mut do_it = false;
+	let mut philo = false;
 	let mut rng = thread_rng();
 
 	for _ in thought_collected.iter() {
@@ -36,10 +37,13 @@ pub(super) fn try_trigger_slang(
 	// Idk he can talk by himself too sometimes
 	if rng.gen_bool(0.0025 * 0.016) {
 		do_it = true;
+		if rng.gen_bool(0.5) {
+			philo = true;
+		}
 	}
 
 	if do_it {
-		trigger.send(SlangTriggerEvent);
+		trigger.send(SlangTriggerEvent {philsophy: philo});
 	}
 }
 
@@ -52,14 +56,23 @@ pub(super) fn play_slang_audio(
 	if events.is_empty() {
 		return;
 	}
+	let philo = events.iter().next().unwrap().philsophy;
 	events.clear();
 
-	let mut rng = thread_rng();
 
-	let tape_choice = rng.gen::<u32>() % 18;
+	let tape = {
+		let mut rng = thread_rng();
+		if philo {
+			let tape_choice = rng.gen::<u32>() % 4;
+			format!("audio/slang/slangg-{:0>2}.ogg", tape_choice+1)
+		} else {
+			let tape_choice = rng.gen::<u32>() % 18;
+			format!("audio/slang/slang_-{:0>2}.ogg", tape_choice+1)
+		}
+	};
 
 	let handle = audio
-	.play(asset_server.load(format!("audio/slang/slang_-{:0>2}.ogg", tape_choice+1)))
+	.play(asset_server.load(tape))
 	.with_volume(2.0)
 	.handle();
 	commands.spawn(SlangAudio(handle)).insert(PrioritySpeaker);
